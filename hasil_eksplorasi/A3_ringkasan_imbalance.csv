@@ -1,0 +1,12 @@
+atribut,n_nilai,terbanyak,n_terbanyak,terlangka,n_terlangka,n_terlangka_train,rasio_imbalance
+cytoplasm_vacuole,2,no,9509,yes,789,464,12.05
+chromatin_density,2,densely,9369,loosely,929,538,10.09
+nuclear_cytoplasmic_ratio,2,low,9060,high,1238,745,7.32
+cytoplasm_colour,3,light blue,7801,purple blue,1095,644,7.12
+cytoplasm_texture,2,clear,8254,frosted,2044,1199,4.04
+nucleus_shape,6,segmented-bilobed,3119,irregular,870,527,3.59
+cell_shape,2,round,7966,irregular,2332,1395,3.42
+granularity,2,yes,7669,no,2629,1563,2.92
+granule_type,4,small,3336,coarse,1216,743,2.74
+granule_colour,4,pink,3245,purple,1305,793,2.49
+cell_size,2,big,5561,small,4737,2876,1.17

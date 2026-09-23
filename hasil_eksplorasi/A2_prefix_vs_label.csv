@@ -1,0 +1,8 @@
+prefix,Basophil,Eosinophil,Lymphocyte,Monocyte,Neutrophil
+BA,1218,0,0,0,0
+BNE,0,0,0,0,1633
+EO,0,3117,0,0,0
+LY,0,0,1214,0,0
+MO,0,0,0,1420,0
+NEUTROPHIL,0,0,0,0,50
+SNE,0,0,0,0,1646

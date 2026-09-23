@@ -1,0 +1,14 @@
+kasus,lolos,catatan,r_lobus,status,n_lobus,rp,br,jarak,lub_n,lub_diisi,lub_dibiarkan,lub_piks,komponen_mentah,komponen_akhir
+cakram_konveks,True,,30.01666203960727,tak_pernah_pecah,1,,1.0,,0,0,0,0,1,1
+halter_leher9,True,,20.024984394500787,normal,2,5.0,0.24968808471946113,999.0,0,0,0,0,1,1
+rantai_leher7_17,True,,20.024984394500787,normal,3,4.0,0.19975046777556893,999.0,0,0,0,0,1,1
+tetangga_di_luar_sel,True,,28.0178514522438,tak_pernah_pecah,1,,1.0,,0,0,0,0,2,1
+dua_lobus_terpisah,True,,28.0178514522438,terpisah_di_nol,2,0.0,0.0,,0,0,0,0,2,2
+lubang_kecil_13px_diisi,True,,30.01666203960727,tak_pernah_pecah,1,,1.0,,1,1,0,13,1,1
+lubang_besar_sitoplasma_biar,True,,9.219544457292887,tak_pernah_pecah,1,,1.0,,1,0,1,441,1,1
+aturan_semua_mengisi,True,,30.01666203960727,tak_pernah_pecah,1,,1.0,,1,1,0,441,1,1
+aturan_tidak_membiarkan,True,,9.219544457292887,tak_pernah_pecah,1,,1.0,,1,0,1,441,1,1
+lubang_besar_latar_diisi,True,,30.01666203960727,tak_pernah_pecah,1,,1.0,,1,1,0,441,1,1
+rosette_selektif,True,,18.027756377319946,normal,3,3.1622776985168457,0.17541160598859604,999.0,1,0,1,747,1,1
+rosette_diisi_semua,True,,19.72308292331602,normal,4,11.661903381347656,0.5912819728380959,3.605551242828369,1,1,0,747,1,1
+rosette_MEKANISME,True,br 0.1754 -> 0.5913,19.72308292331602,normal,4,11.661903381347656,0.5912819728380959,3.605551242828369,1,1,0,747,1,1

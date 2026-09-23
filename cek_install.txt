@@ -1,0 +1,8 @@
+python -c "import torch; print('torch', torch.__version__, '| CUDA:', torch.cuda.is_available())"
+python -c "import torchvision; print('torchvision', torchvision.__version__)"
+python -c "import transformers; print('transformers', transformers.__version__)"
+python -c "import numpy; print('numpy', numpy.__version__)"
+python -c "import PIL; print('Pillow', PIL.__version__)"
+python -c "import pandas; print('pandas', pandas.__version__)"
+
+m2f_tiny_1024_color_20260414_091312

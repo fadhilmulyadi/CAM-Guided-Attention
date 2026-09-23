@@ -1,0 +1,171 @@
+
+===========================================================================
+GERBANG 0 - VERIFIKASI KONVENSI PREFIX BNE / SNE PADA PBC ASLI
+===========================================================================
+Waktu       : 2026-09-17 18:46:20
+Sumber PBC  : D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\PBC_dataset_normal_DIB.zip
+CSV WBCAtt+ : D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\pbc_attr_v1_ccrop_all.csv
+
+Membaca daftar berkas
+---------------------
+  Mode: membaca central directory .zip (tanpa ekstraksi)
+  Total berkas citra ditemukan: 17,092
+
+===========================================================================
+P1. STRUKTUR FOLDER vs TABEL 1 ACEVEDO ET AL. (2020)
+===========================================================================
+  folder       | ditemukan | Tabel 1 | status
+  -------------+-----------+---------+-------
+  basophil     |     1,218 |   1,218 | COCOK 
+  eosinophil   |     3,117 |   3,117 | COCOK 
+  erythroblast |     1,551 |   1,551 | COCOK 
+  ig           |     2,895 |   2,895 | COCOK 
+  lymphocyte   |     1,214 |   1,214 | COCOK 
+  monocyte     |     1,420 |   1,420 | COCOK 
+  neutrophil   |     3,329 |   3,329 | COCOK 
+  platelet     |     2,348 |   2,348 | COCOK 
+
+  Total ditemukan : 17,092
+  Total Tabel 1   : 17,092
+  Selisih         : +0
+  >>> P1 LOLOS
+
+===========================================================================
+P2. SILANG LENGKAP FOLDER x PREFIX  [INTI PEMBUKTIAN]
+===========================================================================
+Kolom 'arti' memakai singkatan standar WBCBench 2026 (arXiv:2604.10797).
+
+  folder       | prefix     | jumlah | arti singkatan standar    
+  -------------+------------+--------+---------------------------
+  basophil     | BA         |  1,218 | basophil                  
+  eosinophil   | EO         |  3,117 | eosinophil                
+  erythroblast | ERB        |  1,551 | erythroblast              
+  ig           | MY         |  1,137 | myelocyte                 
+  ig           | MMY        |  1,015 | metamyelocyte             
+  ig           | PMY        |    592 | promyelocyte              
+  ig           | IG         |    151 | immature granulocyte      
+  lymphocyte   | LY         |  1,214 | lymphocyte                
+  monocyte     | MO         |  1,420 | monocyte                  
+  neutrophil   | SNE        |  1,646 | segmented neutrophil      
+  neutrophil   | BNE        |  1,633 | band neutrophil           
+  neutrophil   | NEUTROPHIL |     50 | neutrophil (tanpa subtipe)
+  platelet     | PLATELET   |  2,348 | platelet                  
+
+Folder yang memuat lebih dari satu prefix
+-----------------------------------------
+Ini pertanyaan struktural terpenting. Folder dengan banyak prefix
+membuktikan prefix mengkodekan SUBTIPE di bawah level folder.
+
+  ig             (4 prefix) : MY=1,137, MMY=1,015, PMY=592, IG=151
+  neutrophil     (3 prefix) : SNE=1,646, BNE=1,633, NEUTROPHIL=50
+
+P2a. Folder 'ig' - uji kunci konvensi penamaan
+----------------------------------------------
+    MY            1,137   myelocyte                    <== singkatan standar
+    MMY           1,015   metamyelocyte                <== singkatan standar
+    PMY             592   promyelocyte                 <== singkatan standar
+    IG              151   immature granulocyte         
+
+  >>> P2a LOLOS. Folder 'ig' memuat 3 singkatan standar
+      granulosit imatur (MMY, MY, PMY).
+      Paper mendokumentasikan folder ini berisi promielosit,
+      mielosit, dan metamielosit. Prefix nama file memisahkan
+      ketiganya. KONVENSI 'prefix = subtipe di bawah folder'
+      TERBUKTI DARI DALAM DATASET ITU SENDIRI.
+
+P2b. Apakah ada prefix yang muncul di lebih dari satu folder?
+-------------------------------------------------------------
+Kebocoran akan merusak klaim 'prefix menentukan identitas sel'.
+
+  Tidak ada. Setiap prefix hanya milik satu folder.
+  >>> P2b LOLOS
+
+===========================================================================
+P3. FOLDER NEUTROFIL - PEMERIKSAAN UTAMA
+===========================================================================
+  prefix     | di PBC | di WBCAtt+ | arti                       | status      
+  -----------+--------+------------+----------------------------+-------------
+  SNE        |  1,646 |      1,646 | segmented neutrophil       | COCOK PERSIS
+  BNE        |  1,633 |      1,633 | band neutrophil            | COCOK PERSIS
+  NEUTROPHIL |     50 |         50 | neutrophil (tanpa subtipe) | COCOK PERSIS
+
+  Total folder neutrophil : 3,329   (Tabel 1: 3,329)
+  BNE + SNE + NEUTROPHIL  : 3,329
+
+  >>> P3a prefix BNE dan SNE hadir      : LOLOS
+  >>> P3b jumlah identik dengan WBCAtt+ : LOLOS
+
+===========================================================================
+P4. PENCOCOKAN NAMA BERKAS DENGAN WBCAtt+
+===========================================================================
+  Baris CSV WBCAtt+ : 10,298
+  Ditemukan di PBC  : 10,298
+  Tidak ditemukan   : 0
+  >>> P4a padanan 1:1 : LOLOS
+
+P4b. Silang label WBCAtt+ x folder PBC (harus diagonal)
+-------------------------------------------------------
+  label WBCAtt+ | folder PBC | jumlah |   
+  --------------+------------+--------+---
+  Basophil      | basophil   |  1,218 | ok
+  Eosinophil    | eosinophil |  3,117 | ok
+  Lymphocyte    | lymphocyte |  1,214 | ok
+  Monocyte      | monocyte   |  1,420 | ok
+  Neutrophil    | neutrophil |  3,329 | ok
+
+  >>> P4b rantai prefix -> folder -> label : LOLOS
+
+P4c. Silang prefix x label WBCAtt+
+----------------------------------
+  prefix     | arti standar               | label WBCAtt+ | jumlah
+  -----------+----------------------------+---------------+-------
+  BA         | basophil                   | Basophil      |  1,218
+  BNE        | band neutrophil            | Neutrophil    |  1,633
+  EO         | eosinophil                 | Eosinophil    |  3,117
+  LY         | lymphocyte                 | Lymphocyte    |  1,214
+  MO         | monocyte                   | Monocyte      |  1,420
+  NEUTROPHIL | neutrophil (tanpa subtipe) | Neutrophil    |     50
+  SNE        | segmented neutrophil       | Neutrophil    |  1,646
+
+  Catatan: BNE dan SNE sama-sama berlabel 'neutrophil' pada WBCAtt+.
+  Itu memang diharapkan - WBCAtt+ memakai 5 kelas, bukan subtipe.
+  Justru itulah sebabnya prefix menjadi sumber label kedua yang
+  independen terhadap anotasi nucleus_shape.
+
+===========================================================================
+P5. DIMENSI CITRA (pemeriksaan versi dataset)
+===========================================================================
+    BNE_358773.jpg               360 x 363
+    SNE_183410.jpg               360 x 363
+    BNE_295701.jpg               360 x 363
+    SNE_30327.jpg                360 x 363
+    SNE_342586.jpg               360 x 363
+
+  Harapan PBC asli   : 360 x 363
+  Harapan versi ccrop: 360 x 360
+
+  Tabel silang tersimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_gerbang0\G0_silang_folder_prefix.csv
+
+===========================================================================
+VONIS GERBANG 0
+===========================================================================
+  kode | pemeriksaan                                   | hasil
+  -----+-----------------------------------------------+------
+  P1   | Struktur folder cocok Tabel 1 Acevedo         | LOLOS
+  P2a  | Folder 'ig' memakai singkatan subtipe standar | LOLOS
+  P2b  | Tidak ada prefix bocor lintas folder          | LOLOS
+  P3a  | Prefix BNE dan SNE hadir di folder neutrofil  | LOLOS
+  P3b  | Jumlah BNE/SNE identik dengan WBCAtt+         | LOLOS
+  P4a  | Padanan nama berkas 1:1 dengan WBCAtt+        | LOLOS
+  P4b  | Rantai prefix -> folder -> label konsisten    | LOLOS
+
+  >>> LOLOS PENUH
+      PBC asli memakai prefix untuk memisahkan subtipe di dalam
+      folder, dengan singkatan hematologi standar. Folder neutrofil
+      terbagi persis menjadi BNE dan SNE dengan jumlah yang sama
+      dengan penghitungan kita. Caveat dokumen Bagian 3 TERTUTUP.
+      Kelompok konflik C (662 sel) berdiri di atas dasar yang sah.
+
+Salin SELURUH keluaran di atas dan kirim balik untuk penentuan
+langkah berikutnya.
+===========================================================================

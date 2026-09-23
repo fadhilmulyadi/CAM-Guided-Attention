@@ -1,0 +1,247 @@
+
+===========================================================================
+FASE 2B - KALIBRASI, INVARIANSI AMBANG, DAN AUDIT BIAS BAND
+===========================================================================
+Waktu        : 2026-09-18 06:01:11
+Konektivitas : 8   Isi lubang: ya
+
+===========================================================================
+S0. UJI SANITAS DIPERKETAT (toleransi 0,005)
+===========================================================================
+  kasus sintetis              | r_lobus | status           | r_pisah(min) | harapan | r_pisah(max) | n_lob | harap |   
+  ----------------------------+---------+------------------+--------------+---------+--------------+-------+-------+---
+  cakram konveks              |  30.017 | tak_pernah_pecah |            - |       - |            - |     1 |     1 | OK
+  halter, leher 9 baris       |  20.025 | normal           |       5.0000 |  5.0000 |       5.0000 |     2 |     2 | OK
+  rantai leher 7 dan 17 baris |  22.023 | normal           |       4.0000 |  4.0000 |       9.0000 |     3 |     3 | OK
+  dua cakram terpisah         |  20.025 | terpisah_di_nol  |       0.0000 |  0.0000 |       0.0000 |     2 |     2 | OK
+  cakram + tonjolan kecil     |  30.017 | tak_pernah_pecah |            - |       - |            - |     1 |     1 | OK
+
+  Toleransi: 0,02 piksel pada r_pisah dan 0,005 pada rasio.
+  Kasus 3 membedakan min dari max: 4,0 benar, 9,0 salah.
+  Kasus 5 menguji filter persistence menolak tonjolan derau.
+  >>> UJI SANITAS: LOLOS
+
+Mengindeks mask dan membaca CSV
+-------------------------------
+  Mask terindeks: 10,298
+  Baris CSV     : 10,298
+  Replikasi kelompok Fase 1: LOLOS
+  Cache dimuat: 300 sel dari D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2b\cache_persistensi_conn8_lub1_pr0.05.pkl.gz
+  Cache tidak lengkap untuk target ini, menghitung ulang.
+
+Menghitung persistensi
+----------------------
+  Sel: 10,298   Pekerja: 7
+  Selesai 265.5 detik
+  Cache disimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2b\cache_persistensi_conn8_lub1_pr0.05.pkl.gz
+  Sel tersedia: 10,298
+  Non-neutrofil (kalibrasi): 6,969
+  Neutrofil (evaluasi)     : 3,329
+
+===========================================================================
+P1. KALIBRASI PARAMETER DARI JUMLAH LOBUS - SEL NON-NEUTROFIL SAJA
+===========================================================================
+Jangkar: label nucleus_shape pada sel basofil, eosinofil, limfosit,
+monosit. Tidak satu pun sel ini masuk kelompok A atau B, jadi
+parameter tidak pernah disetel memakai data yang menguji ambang.
+
+Harapan jumlah lobus: round 1 | indented 1 | bilobed 2 | multilobed >=3
+('irregular' dan 'unsegmented-band' dikecualikan: jumlah lobusnya
+memang tidak tunggal secara definisi.)
+
+  Sel kalibrasi: 5,736
+
+Skor kecocokan jumlah lobus (baris tau, kolom rho)
+--------------------------------------------------
+  tau \ rho |     0 |   0.1 |   0.2 |   0.3 |   0.4 |   0.5
+  ----------+-------+-------+-------+-------+-------+------
+  0.1       | 0.325 | 0.328 | 0.331 | 0.335 | 0.340 | 0.346
+  0.25      | 0.442 | 0.447 | 0.452 | 0.459 | 0.466 | 0.472
+  0.5       | 0.612 | 0.620 | 0.632 | 0.641 | 0.651 | 0.659
+  0.75      | 0.662 | 0.665 | 0.674 | 0.682 | 0.693 | 0.701
+  1         | 0.691 | 0.693 | 0.698 | 0.705 | 0.717 | 0.725
+  1.5       | 0.721 | 0.722 | 0.725 | 0.732 | 0.742 | 0.750
+  2         | 0.748 | 0.749 | 0.751 | 0.758 | 0.766 | 0.771
+  2.5       | 0.766 | 0.766 | 0.768 | 0.774 | 0.782 | 0.786
+  3         | 0.778 | 0.778 | 0.779 | 0.784 | 0.791 | 0.793
+  4         | 0.794 | 0.794 | 0.795 | 0.798 | 0.802 | 0.803
+
+  >>> Terpilih: tau = 4, rho = 0.5
+      skor kecocokan lobus     : 0.8030
+      limfosit tak pernah pecah: 98.1%
+      mean lobus round / bilobed / multilobed: 1.02 / 2.03 / 2.69
+      (harapan: 1,00 / 2,00 / >=3,00)
+
+Pembanding: parameter yang dipilih AUC di 2A-rev
+------------------------------------------------
+  tau=0,1 rho=0,3 -> skor 0.3353, limfosit 60.6%, lobus 1.95/6.06/6.96
+  Itulah yang ditolak kriteria baru.
+
+===========================================================================
+P2. INVARIANSI AMBANG TERHADAP PARAMETER [HASIL KUNCI]
+===========================================================================
+Lobus palsu muncul di punggungan tebal, jadi bergabung pada saddle
+TINGGI. Operator 'min' mengabaikannya. Bridge ratio karena itu
+kebal terhadap tau secara struktural, sementara jumlah lobus tidak.
+
+  tau \ rho |      0 |    0.1 |    0.2 |    0.3 |    0.4 |    0.5
+  ----------+--------+--------+--------+--------+--------+-------
+  0.1       | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  0.25      | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  0.5       | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  0.75      | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  1         | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  1.5       | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  2         | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  2.5       | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  3         | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+  4         | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588 | 0.3588
+
+  Ambang Youden di 60 kombinasi parameter:
+    min 0.3588   maks 0.3588   rentang 0.0000   sd 0.0000
+    nilai unik: 1
+
+===========================================================================
+P3. HASIL PADA PARAMETER TERKALIBRASI (tau=4, rho=0.5)
+===========================================================================
+  AUC (A vs B)            : 0.8837     [v1 0.9227 | 2A-rev 0.8933]
+  Ambang optimal Youden   : 0.3588   (J = 0.7631)
+  Bootstrap 2000x median : 0.3701   [v1 0.3333]
+  IK 95%                  : [0.3192 - 0.3880]
+  >>> 1/3 di dalam IK 95% : YA
+  Akurasi pada 1/3        : 89.37%   [v1 90.04%]
+
+Generalisasi train -> test
+--------------------------
+  Ambang dari TRAIN    : 0.3715   (n=940+569)
+  AUC di TEST          : 0.8646   (n=459+310)
+  Akurasi TEST @ambang : 89.21%
+  Akurasi TEST @ 1/3   : 89.21%
+
+Matriks konfusi pada ambang 1/3 (A dan B saja)
+----------------------------------------------
+  sumber        | -> band | -> segmented |     n | benar
+  --------------+---------+--------------+-------+------
+  A (band)      |   1,482 |           73 | 1,555 | 95.3%
+  B (segmented) |     196 |          780 |   976 | 79.9%
+
+  Sensitivitas band      : 95.31%
+  Spesifisitas band      : 79.92%
+  ASIMETRI GALAT         : band salah 4.69% vs segmented salah 20.08%
+
+===========================================================================
+P4. AUDIT EKOR B - APAKAH MASK MENJEMBATANI FILAMEN?
+===========================================================================
+Hipotesis: wbcsegmentor mengisi filamen kromatin selebar 1-2 piksel,
+sehingga leher terukur lebih tebal dari aslinya. Bila benar, r_pisah
+sel B yang salah klasifikasi akan MENUMPUK di kisaran sempit
+(sekitar 2-4 piksel), bukan tersebar merata.
+
+  kelompok             |    n | mean rp |   q25 | median |   q75 | rp dalam 2-4 px
+  ---------------------+------+---------+-------+--------+-------+----------------
+  B salah -> band      |  130 |   11.45 |  8.50 |  10.54 | 13.00 |            0.0%
+  B benar -> segmented |  780 |    2.81 |  1.41 |   2.24 |  4.00 |           48.7%
+  A benar -> band      | 1128 |   12.83 | 10.63 |  12.53 | 14.32 |            0.0%
+
+  Bila 'B salah' menumpuk di 2-4 px jauh lebih rapat daripada
+  'A benar', hipotesis penjembatanan mask didukung.
+
+Apakah lobusnya terdeteksi tapi lehernya terukur tebal?
+-------------------------------------------------------
+  B salah -> band          n= 196  mean n_lobus 1.93  >=2 lobus  66.3%  mean r_lobus 26.33  mean luas 6,155
+  B benar -> segmented     n= 780  mean n_lobus 2.78  >=2 lobus 100.0%  mean r_lobus 22.27  mean luas 6,077
+
+  Bila 'B salah' tetap punya >=2 lobus, berarti lobusnya MEMANG
+  terdeteksi dan hanya lehernya yang terukur terlalu tebal.
+  Itu menunjuk resolusi mask, bukan kegagalan metode.
+
+Rincian ekor B menurut nucleus_shape
+------------------------------------
+  nucleus_shape        | n di B | salah -> band | persen
+  ---------------------+--------+---------------+-------
+  segmented-bilobed    |    576 |           109 |  18.9%
+  segmented-multilobed |    400 |            87 |  21.8%
+
+  Daftar lengkap 196 sel: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2b\audit_ekor_B.csv
+
+===========================================================================
+P5. KONTROL, LOBUS, DAN KELOMPOK KONFLIK
+===========================================================================
+
+Kontrol lintas kelas sel
+------------------------
+  kelas      |    n | median br | tak pernah pecah | rata n_lobus
+  -----------+------+-----------+------------------+-------------
+  Basophil   | 1218 |    0.6226 |            44.0% |         1.77
+  Eosinophil | 3117 |    0.1218 |             9.8% |         2.18
+  Lymphocyte | 1214 |    1.0000 |            98.1% |         1.02
+  Monocyte   | 1420 |    1.0000 |            79.2% |         1.24
+  Neutrophil | 3329 |    0.4763 |            17.3% |         2.16
+
+Jumlah lobus per nucleus_shape (T2 metode lama: 81,4% gagal)
+------------------------------------------------------------
+  nucleus_shape        |    n | mean n_lobus | median | hanya 1 lobus | median br
+  ---------------------+------+--------------+--------+---------------+----------
+  unsegmented-round    | 1069 |        1.020 |      1 |         98.3% |    1.0000
+  unsegmented-indented | 1342 |        1.238 |      1 |         79.5% |    1.0000
+  irregular            |  870 |        1.318 |      1 |         74.8% |    1.0000
+  unsegmented-band     | 2614 |        1.971 |      2 |         21.0% |    0.5468
+  segmented-bilobed    | 3119 |        2.108 |      2 |          9.3% |    0.1310
+  segmented-multilobed | 1284 |        2.728 |      3 |          9.8% |    0.1064
+
+Kelompok konflik
+----------------
+  kelompok                |    n |    q25 | median |    q75 | p(band) | entropi
+  ------------------------+------+--------+--------+--------+---------+--------
+  A_sepakat_band          | 1555 | 0.4829 | 0.5861 | 0.7463 |   0.953 |   0.273
+  B_sepakat_segmented     |  976 | 0.0841 | 0.1430 | 0.2751 |   0.201 |   0.724
+  C_konflik_SNE_band      |  662 | 0.3656 | 0.4408 | 0.5833 |   0.813 |   0.696
+  D_konflik_BNE_segmented |   48 | 0.3725 | 0.4881 | 0.6529 |   0.833 |   0.650
+  E_lainnya               |   38 | 1.0000 | 1.0000 | 1.0000 |   0.974 |   0.176
+  F_tak_bersubtipe        |   50 | 0.1142 | 0.2546 | 0.4201 |   0.400 |   0.971
+
+  Posisi pada sumbu A->B (0% = band murni, 100% = segmented murni):
+    C_konflik            32.8%
+    D_konflik            22.1%
+    F_tak_bersubtipe     74.8%
+  Pembanding Fase 1 pada bridge ratio: C = 33,9%
+  (dokumen konteks menulis 54,2%, tetapi itu diukur pada indeks LDA,
+   bukan bridge ratio - dua sumbu berbeda)
+
+Kepadatan di zona perbatasan
+----------------------------
+  pita          |     A |     B |     C |     D
+  --------------+-------+-------+-------+------
+  [0.28 - 0.38] |  3.7% |  7.8% | 19.5% | 12.5%
+  [0.23 - 0.43] | 10.7% | 17.3% | 42.4% | 18.8%
+
+===========================================================================
+P6. TRIANGULASI DENGAN FASE 1
+===========================================================================
+  n terbandingkan         : 3,279
+  Pearson  (v1, final)    : 0.6755
+  Spearman (v1, final)    : 0.7360
+  Berpindah sisi 1/3      : 413 (12.60%)
+  Spearman(br, indeks LDA): -0.6699   [v1: -0.7403]
+
+  Tersimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2b\bridge_ratio_final.csv
+
+  Montase: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2b\montase_B_salah_disebut_band.png
+  Montase: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2b\montase_B_benar_segmented.png
+  Montase: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2b\montase_A_benar_band.png
+
+===========================================================================
+RINGKASAN
+===========================================================================
+  Parameter terkalibrasi  : tau=4, rho=0.5
+    dipilih dari kecocokan lobus pada 5,736 sel NON-neutrofil
+  AUC (A vs B)            : 0.8837
+  Ambang bootstrap        : 0.3701
+  IK 95%                  : [0.3192 - 0.3880]
+  1/3 di dalam IK         : YA
+  Akurasi @1/3            : 89.37%
+  Rentang ambang di 60 kombinasi parameter: 0.0000
+  Asimetri galat          : A salah 4.7% vs B salah 20.1%
+
+Kirim seluruh keluaran ini, dan periksa montase secara visual.
+===========================================================================

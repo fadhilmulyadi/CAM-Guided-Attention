@@ -1,0 +1,14 @@
+folder,prefix,jumlah,arti_standar
+basophil,BA,1218,basophil
+eosinophil,EO,3117,eosinophil
+erythroblast,ERB,1551,erythroblast
+ig,MY,1137,myelocyte
+ig,MMY,1015,metamyelocyte
+ig,PMY,592,promyelocyte
+ig,IG,151,immature granulocyte
+lymphocyte,LY,1214,lymphocyte
+monocyte,MO,1420,monocyte
+neutrophil,SNE,1646,segmented neutrophil
+neutrophil,BNE,1633,band neutrophil
+neutrophil,NEUTROPHIL,50,neutrophil (tanpa subtipe)
+platelet,PLATELET,2348,platelet

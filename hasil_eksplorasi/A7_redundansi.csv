@@ -1,0 +1,12 @@
+atribut,akurasi_dari_atribut_lain,baseline_kelas_mayoritas,kenaikan
+granularity,0.9999,0.7447,0.2552
+granule_type,0.9921,0.3239,0.6682
+granule_colour,0.991,0.3151,0.6759
+nuclear_cytoplasmic_ratio,0.9759,0.8798,0.0961
+cytoplasm_vacuole,0.9556,0.9234,0.0322
+chromatin_density,0.9326,0.9098,0.0228
+cytoplasm_texture,0.9183,0.8015,0.1168
+cytoplasm_colour,0.8921,0.7575,0.1346
+cell_shape,0.7776,0.7735,0.0041
+cell_size,0.7022,0.54,0.1622
+nucleus_shape,0.6456,0.3029,0.3427

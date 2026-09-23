@@ -1,0 +1,394 @@
+RINGKASAN EKSPLORASI DATASET WBCAtt+
+dibuat dari: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_eksplorasi
+
+==========================================================================
+BAGIAN A -- LEVEL CSV
+==========================================================================
+
+--- A1. Baris yang melanggar aturan logis ---
+                 img_name       label cell_size cell_shape      nucleus_shape nuclear_cytoplasmic_ratio chromatin_density cytoplasm_vacuole cytoplasm_texture cytoplasm_colour granule_type granule_colour granularity                 path  split
+1954  EO_197001_ccrop.jpg  Eosinophil     small      round  segmented-bilobed                       low           densely                no             clear       light blue          nil            red         yes  EO_197001_ccrop.jpg  train
+8156  EO_244392_ccrop.jpg  Eosinophil       big      round  segmented-bilobed                       low           densely                no             clear       light blue          nil            red         yes  EO_244392_ccrop.jpg   test
+
+--- A2. Prefix nama file vs label kelas ---
+            Basophil  Eosinophil  Lymphocyte  Monocyte  Neutrophil
+prefix                                                            
+BA              1218           0           0         0           0
+BNE                0           0           0         0        1633
+EO                 0        3117           0         0           0
+LY                 0           0        1214         0           0
+MO                 0           0           0      1420           0
+NEUTROPHIL         0           0           0         0          50
+SNE                0           0           0         0        1646
+
+--- A2b. Subtipe neutrofil vs bentuk nukleus (%) ---
+        irregular  segmented-bilobed  segmented-multilobed  unsegmented-band  unsegmented-indented  unsegmented-round
+prefix                                                                                                               
+BNE         1.225              1.960                 0.980            95.224                 0.306              0.306
+SNE         0.304             34.994                24.301            40.219                 0.061              0.122
+
+--- A3. Ringkasan imbalance per atribut ---
+                           n_nilai          terbanyak  n_terbanyak    terlangka  n_terlangka  n_terlangka_train  rasio_imbalance
+atribut                                                                                                                         
+cytoplasm_vacuole                2                 no         9509          yes          789                464           12.050
+chromatin_density                2            densely         9369      loosely          929                538           10.090
+nuclear_cytoplasmic_ratio        2                low         9060         high         1238                745            7.320
+cytoplasm_colour                 3         light blue         7801  purple blue         1095                644            7.120
+cytoplasm_texture                2              clear         8254      frosted         2044               1199            4.040
+nucleus_shape                    6  segmented-bilobed         3119    irregular          870                527            3.590
+cell_shape                       2              round         7966    irregular         2332               1395            3.420
+granularity                      2                yes         7669           no         2629               1563            2.920
+granule_type                     4              small         3336       coarse         1216                743            2.740
+granule_colour                   4               pink         3245       purple         1305                793            2.490
+cell_size                        2                big         5561        small         4737               2876            1.170
+
+--- A3b. Distribusi tiap nilai atribut ---
+                                          nilai  jumlah  persen
+atribut                                                        
+cell_size                                   big    5561  54.000
+cell_size                                 small    4737  46.000
+cell_shape                                round    7966  77.350
+cell_shape                            irregular    2332  22.650
+nucleus_shape                 segmented-bilobed    3119  30.290
+nucleus_shape                  unsegmented-band    2614  25.380
+nucleus_shape              unsegmented-indented    1342  13.030
+nucleus_shape              segmented-multilobed    1284  12.470
+nucleus_shape                 unsegmented-round    1069  10.380
+nucleus_shape                         irregular     870   8.450
+nuclear_cytoplasmic_ratio                   low    9060  87.980
+nuclear_cytoplasmic_ratio                  high    1238  12.020
+chromatin_density                       densely    9369  90.980
+chromatin_density                       loosely     929   9.020
+cytoplasm_vacuole                            no    9509  92.340
+cytoplasm_vacuole                           yes     789   7.660
+cytoplasm_texture                         clear    8254  80.150
+cytoplasm_texture                       frosted    2044  19.850
+cytoplasm_colour                     light blue    7801  75.750
+cytoplasm_colour                           blue    1402  13.610
+cytoplasm_colour                    purple blue    1095  10.630
+granule_type                              small    3336  32.390
+granule_type                              round    3115  30.250
+granule_type                                nil    2631  25.550
+granule_type                             coarse    1216  11.810
+granule_colour                             pink    3245  31.510
+granule_colour                              red    3118  30.280
+granule_colour                              nil    2630  25.540
+granule_colour                           purple    1305  12.670
+granularity                                 yes    7669  74.470
+granularity                                  no    2629  25.530
+
+--- A4. Drift split (10 teratas) ---
+                                  nilai  train%   val%  test%  selisih_maks
+atribut                                                                    
+nucleus_shape      segmented-multilobed  11.752 13.689 13.488         1.937
+cytoplasm_colour             light blue  76.074 76.699 74.798         1.901
+cytoplasm_colour                   blue  13.487 12.524 14.230         1.706
+cell_size                         small  46.620 45.243 45.015         1.606
+cell_size                           big  53.380 54.757 54.985         1.606
+nucleus_shape      unsegmented-indented  12.466 13.301 14.069         1.604
+nucleus_shape         segmented-bilobed  30.783 30.388 29.268         1.515
+chromatin_density               densely  91.279 89.903 90.739         1.376
+chromatin_density               loosely   8.721 10.097  9.261         1.376
+granule_colour                   purple  12.855 13.398 12.068         1.330
+
+--- A5. NMI atribut vs kelas sel ---
+                           NMI_dengan_label
+granule_type                          0.926
+granule_colour                        0.909
+granularity                           0.542
+nucleus_shape                         0.488
+cytoplasm_colour                      0.447
+cytoplasm_texture                     0.372
+nuclear_cytoplasmic_ratio             0.316
+chromatin_density                     0.186
+cell_size                             0.132
+cytoplasm_vacuole                     0.131
+cell_shape                            0.064
+
+--- A6. Matriks Cramer's V antar-atribut ---
+                           cell_size  cell_shape  nucleus_shape  nuclear_cytoplasmic_ratio  chromatin_density  cytoplasm_vacuole  cytoplasm_texture  cytoplasm_colour  granule_type  granule_colour  granularity
+cell_size                      1.000       0.209          0.329                      0.377              0.211              0.226              0.000             0.118         0.234           0.229        0.081
+cell_shape                     0.209       1.000          0.276                      0.087              0.288              0.388              0.282             0.284         0.343           0.343        0.313
+nucleus_shape                  0.329       0.276          1.000                      0.780              0.552              0.406              0.785             0.635         0.688           0.680        0.919
+nuclear_cytoplasmic_ratio      0.377       0.087          0.780                      1.000              0.057              0.095              0.428             0.647         0.623           0.623        0.623
+chromatin_density              0.211       0.288          0.552                      0.057              1.000              0.467              0.480             0.445         0.497           0.497        0.497
+cytoplasm_vacuole              0.226       0.388          0.406                      0.095              0.467              1.000              0.374             0.330         0.380           0.380        0.376
+cytoplasm_texture              0.000       0.282          0.785                      0.428              0.480              0.374              1.000             0.844         0.849           0.850        0.850
+cytoplasm_colour               0.118       0.284          0.635                      0.647              0.445              0.330              0.844             1.000         0.678           0.678        0.959
+granule_type                   0.234       0.343          0.688                      0.623              0.497              0.380              0.849             0.678         1.000           0.984        0.999
+granule_colour                 0.229       0.343          0.680                      0.623              0.497              0.380              0.850             0.678         0.984           1.000        1.000
+granularity                    0.081       0.313          0.919                      0.623              0.497              0.376              0.850             0.959         0.999           1.000        1.000
+
+--- A7. Redundansi (prediksi atribut dari atribut lain) ---
+                           akurasi_dari_atribut_lain  baseline_kelas_mayoritas  kenaikan
+atribut                                                                                 
+granularity                                    1.000                     0.745     0.255
+granule_type                                   0.992                     0.324     0.668
+granule_colour                                 0.991                     0.315     0.676
+nuclear_cytoplasmic_ratio                      0.976                     0.880     0.096
+cytoplasm_vacuole                              0.956                     0.923     0.032
+chromatin_density                              0.933                     0.910     0.023
+cytoplasm_texture                              0.918                     0.801     0.117
+cytoplasm_colour                               0.892                     0.757     0.135
+cell_shape                                     0.778                     0.773     0.004
+cell_size                                      0.702                     0.540     0.162
+nucleus_shape                                  0.646                     0.303     0.343
+
+--- A8. Plafon Concept Bottleneck ---
+   kombinasi_unik  kombinasi_ambigu  gambar_ambigu  plafon_cbm
+0             337                26           2031       0.992
+
+--- A9. Kesulitan per nilai atribut (baseline) ---
+                        Attribute Value     F1
+Attribute Name                                
+Nucleus Shape      Segmented-Multilobed 64.600
+Nucleus Shape                 Irregular 65.290
+Chromatin Density               Loosely 74.090
+Nucleus Shape         Segmented-Bilobed 76.890
+Cytoplasm Color             Purple Blue 79.500
+Cytoplasm Vacuole                   Yes 81.300
+Cell Size                         Small 81.787
+Nucleus Shape      Unsegmented-Indented 83.045
+Cytoplasm Color                    Blue 84.168
+Cell Size                           Big 85.195
+Nucleus Shape          Unsegmented-Band 85.373
+Cell Shape                    Irregular 85.472
+Nucleus Shape         Unsegmented-Round 85.745
+Cytoplasm Texture               Frosted 90.855
+NC Ratio                           High 93.655
+Cell Shape                        Round 95.877
+Granule Color                    Purple 97.132
+Chromatin Density               Densely 97.255
+Cytoplasm Texture                 Clear 97.515
+Cytoplasm Vacuole                    No 98.487
+Granule Color                      Pink 98.927
+NC Ratio                            Low 99.135
+Granule Type                     Coarse 99.198
+Cytoplasm Color              Light Blue 99.278
+Granule Type                        Nil 99.510
+Granule Type                      Small 99.510
+Granularity                          No 99.537
+Granule Color                       Nil 99.575
+Granularity                         Yes 99.835
+Granule Type                      Round 99.882
+Granule Color                       Red 99.950
+
+--- A5b. Distribusi atribut per kelas sel ---
+=== cell_size (% per kelas) ===
+cell_size    big  small
+label                  
+Basophil    27.3   72.7
+Eosinophil  63.3   36.7
+Lymphocyte   0.8   99.2
+Monocyte    86.5   13.5
+Neutrophil  60.6   39.4
+
+=== cell_shape (% per kelas) ===
+cell_shape  irregular  round
+label                       
+Basophil         11.0   89.0
+Eosinophil        8.3   91.7
+Lymphocyte       32.9   67.1
+Monocyte         55.5   44.5
+Neutrophil       22.6   77.4
+
+=== nucleus_shape (% per kelas) ===
+nucleus_shape  irregular  segmented-bilobed  segmented-multilobed  unsegmented-band  unsegmented-indented  unsegmented-round
+label                                                                                                                       
+Basophil            41.5               28.6                  19.1               6.4                   2.1                2.3
+Eosinophil           0.8               68.7                  19.6               9.9                   0.7                0.3
+Lymphocyte           3.7                0.0                   0.0               0.0                  18.9               77.4
+Monocyte            19.0                0.3                   0.0               0.0                  74.7                6.0
+Neutrophil           0.8               18.8                  13.2              66.9                   0.2                0.2
+
+=== nuclear_cytoplasmic_ratio (% per kelas) ===
+nuclear_cytoplasmic_ratio  high    low
+label                                 
+Basophil                    0.5   99.5
+Eosinophil                  0.0  100.0
+Lymphocyte                 92.8    7.2
+Monocyte                    7.3   92.7
+Neutrophil                  0.0  100.0
+
+=== chromatin_density (% per kelas) ===
+chromatin_density  densely  loosely
+label                              
+Basophil             100.0      0.0
+Eosinophil            99.4      0.6
+Lymphocyte            97.7      2.3
+Monocyte              40.2     59.8
+Neutrophil            99.0      1.0
+
+=== cytoplasm_vacuole (% per kelas) ===
+cytoplasm_vacuole     no   yes
+label                         
+Basophil            99.8   0.2
+Eosinophil          99.7   0.3
+Lymphocyte         100.0   0.0
+Monocyte            53.9  46.1
+Neutrophil          96.3   3.7
+
+=== cytoplasm_texture (% per kelas) ===
+cytoplasm_texture  clear  frosted
+label                            
+Basophil           100.0      0.0
+Eosinophil         100.0      0.0
+Lymphocyte          35.2     64.8
+Monocyte            11.5     88.5
+Neutrophil         100.0      0.0
+
+=== cytoplasm_colour (% per kelas) ===
+cytoplasm_colour  blue  light blue  purple blue
+label                                          
+Basophil           0.0        99.7          0.3
+Eosinophil         0.1        99.9          0.0
+Lymphocyte        61.3         3.0         35.7
+Monocyte          46.1         7.6         46.3
+Neutrophil         0.0       100.0          0.0
+
+=== granule_type (% per kelas) ===
+granule_type  coarse   nil  round  small
+label                                   
+Basophil        99.4   0.0    0.0    0.6
+Eosinophil       0.0   0.1   99.9    0.0
+Lymphocyte       0.1  99.7    0.0    0.2
+Monocyte         0.0  99.8    0.0    0.2
+Neutrophil       0.1   0.1    0.0   99.8
+
+=== granule_colour (% per kelas) ===
+granule_colour   nil  pink  purple    red
+label                                    
+Basophil         0.0   0.0   100.0    0.0
+Eosinophil       0.0   0.0     0.0  100.0
+Lymphocyte      99.7   0.0     0.3    0.0
+Monocyte        99.8   0.2     0.0    0.0
+Neutrophil       0.1  97.4     2.5    0.0
+
+=== granularity (% per kelas) ===
+granularity    no    yes
+label                   
+Basophil      0.0  100.0
+Eosinophil    0.0  100.0
+Lymphocyte   99.7    0.3
+Monocyte     99.8    0.2
+Neutrophil    0.1   99.9
+
+
+
+==========================================================================
+BAGIAN B -- LEVEL PIKSEL
+==========================================================================
+
+--- B3. Komposisi piksel per kelas sel (%) ---
+            piks_sitoplasma  piks_nukleus  piks_vakuola  piks_trombosit  piks_sel_lain
+label                                                                                 
+Basophil              9.556        11.198         0.006           0.754         78.486
+Eosinophil           14.647         9.941         0.003           0.579         74.831
+Lymphocyte            3.649        10.301         0.001           0.521         85.529
+Monocyte             13.255        14.783         0.998           0.408         70.556
+Neutrophil           14.972         8.700         0.025           0.398         75.905
+
+--- B4. Konsistensi atribut subjektif vs ukuran piksel ---
+                     atribut  fitur_piksel   AUC    ambang  akurasi_ambang_tunggal
+0  nuclear_cytoplasmic_ratio      rasio_NC 0.992     0.604                   0.950
+1                  cell_size      luas_sel 0.902 14380.000                   0.827
+2          cytoplasm_vacuole  frak_vakuola 0.969     0.003                   0.992
+3                granularity      cyto_std 0.641    34.967                   0.691
+4          chromatin_density  nuc_gray_std 0.768    32.573                   0.909
+5                 cell_shape  sel_solidity 0.897     0.981                   0.820
+
+--- B5. Jumlah lobus vs nucleus_shape (%) ---
+                          1      2     3     4     5
+nucleus_shape                                       
+irregular            93.333  5.632 0.920 0.000 0.115
+segmented-bilobed    86.823 12.568 0.481 0.064 0.064
+segmented-multilobed 81.386 14.564 3.271 0.545 0.234
+unsegmented-band     96.595  3.137 0.268 0.000 0.000
+unsegmented-indented 96.572  3.204 0.149 0.075 0.000
+unsegmented-round    96.913  2.993 0.094 0.000 0.000
+
+--- B6. Statistik warna sitoplasma per kelas ---
+                        cyto_R            cyto_R.1              cyto_G            cyto_G.1              cyto_B            cyto_B.1
+NaN                       mean                 std                mean                 std                mean                 std
+label                      NaN                 NaN                 NaN                 NaN                 NaN                 NaN
+Basophil    126.70439649714712   18.50049716337768   75.32139555570018  18.610292322390446  150.12131297976347  10.641524607690664
+Eosinophil  174.71354285787197  12.952624534463137  110.21675711199728  14.261709580472909   149.4340586316621    8.33456983410667
+Lymphocyte   132.6570962728384  22.835912516172623  102.72542107362402  22.892893230761132  165.45853783706775   9.861387017516995
+Monocyte    164.67922758052535  18.847103726942372  133.55244183867126   21.49036151845883  176.27309528127918    8.41406681657463
+Neutrophil   199.7722268228362  11.630063932859805  158.83159974359666   14.52232400097917  175.90028322610277   6.521195552138244
+
+--- B6b. Label warna vs warna terukur (%) ---
+                  paling merah      2      3  paling biru
+cytoplasm_colour                                         
+blue                     0.143  0.143 24.394       75.321
+light blue              32.983 32.932 21.190       12.896
+purple blue              0.000  0.274 52.877       46.849
+
+--- B7. Kandidat anotasi bermasalah ---
+
+  vakuola_yes_tanpa_piksel: 48 gambar
+            img_name      label  rasio_NC  frak_vakuola cytoplasm_vacuole nuclear_cytoplasmic_ratio
+ BA_339232_ccrop.jpg   Basophil     0.614         0.000               yes                       low
+BNE_112967_ccrop.jpg Neutrophil     0.372         0.000               yes                       low
+BNE_148538_ccrop.jpg Neutrophil     0.378         0.000               yes                       low
+BNE_172318_ccrop.jpg Neutrophil     0.285         0.000               yes                       low
+BNE_352014_ccrop.jpg Neutrophil     0.373         0.000               yes                       low
+BNE_431488_ccrop.jpg Neutrophil     0.369         0.000               yes                       low
+BNE_436393_ccrop.jpg Neutrophil     0.353         0.000               yes                       low
+BNE_462949_ccrop.jpg Neutrophil     0.388         0.000               yes                       low
+BNE_545123_ccrop.jpg Neutrophil     0.356         0.000               yes                       low
+BNE_546147_ccrop.jpg Neutrophil     0.448         0.000               yes                       low
+
+  vakuola_no_ada_piksel: 11 gambar
+            img_name      label  rasio_NC  frak_vakuola cytoplasm_vacuole nuclear_cytoplasmic_ratio
+ BA_773081_ccrop.jpg   Basophil     0.552         0.032                no                       low
+BNE_359949_ccrop.jpg Neutrophil     0.511         0.035                no                       low
+BNE_441101_ccrop.jpg Neutrophil     0.338         0.040                no                       low
+ EO_774353_ccrop.jpg Eosinophil     0.519         0.057                no                       low
+ MO_266868_ccrop.jpg   Monocyte     0.550         0.047                no                       low
+ MO_499033_ccrop.jpg   Monocyte     0.504         0.089                no                       low
+ MO_804611_ccrop.jpg   Monocyte     0.458         0.023                no                       low
+SNE_556912_ccrop.jpg Neutrophil     0.357         0.021                no                       low
+ MO_610112_ccrop.jpg   Monocyte     0.560         0.030                no                       low
+SNE_106040_ccrop.jpg Neutrophil     0.412         0.028                no                       low
+
+  nc_low_rasio_tinggi: 1 gambar
+           img_name    label  rasio_NC  frak_vakuola cytoplasm_vacuole nuclear_cytoplasmic_ratio
+BA_738477_ccrop.jpg Basophil     0.813         0.000                no                       low
+
+--- B2. Statistik agregat fitur mask ---
+  jumlah sel: 10298
+                     count      mean      std      min       25%       50%       75%       max
+luas_sel         10298.000 15383.321 5022.737 3685.000 12474.000 14897.000 17660.750 46531.000
+luas_sel_rel     10298.000     0.119    0.039    0.028     0.096     0.115     0.136     0.359
+rasio_NC         10298.000     0.470    0.139    0.195     0.372     0.421     0.533     0.966
+frak_vakuola     10298.000     0.004    0.020    0.000     0.000     0.000     0.000     0.242
+n_lobus          10298.000     1.096    0.342    1.000     1.000     1.000     1.000     7.000
+nuc_solidity     10298.000     0.853    0.092    0.507     0.788     0.862     0.929     0.990
+nuc_eccentricity 10298.000     0.711    0.163    0.098     0.609     0.745     0.842     0.967
+nuc_circularity  10298.000     0.485    0.202    0.071     0.333     0.422     0.614     0.927
+sel_solidity     10298.000     0.975    0.029    0.497     0.976     0.986     0.989     0.993
+cyto_std         10298.000    22.135    6.935    9.956    17.414    20.183    24.939    51.859
+cyto_entropi     10298.000     3.260    0.418    2.048     2.992     3.214     3.521     4.346
+nuc_gray_std     10298.000    18.553    3.010    6.081    16.860    18.918    20.588    33.674
+tinggi           10298.000   360.000    0.000  360.000   360.000   360.000   360.000   360.000
+lebar            10298.000   360.000    0.000  360.000   360.000   360.000   360.000   360.000
+
+  rata-rata per kelas sel:
+            luas_sel  luas_sel_rel  rasio_NC  frak_vakuola  n_lobus  nuc_solidity  nuc_eccentricity  nuc_circularity  sel_solidity  cyto_std  cyto_entropi  nuc_gray_std  tinggi   lebar
+label                                                                                                                                                                                   
+Basophil   12713.497         0.098     0.546         0.000    1.133         0.878             0.653            0.470         0.972    35.280         3.912        17.383 360.000 360.000
+Eosinophil 15881.927         0.123     0.408         0.000    1.182         0.808             0.804            0.379         0.983    21.202         3.241        19.350 360.000 360.000
+Lymphocyte  8483.199         0.065     0.759         0.000    1.031         0.977             0.490            0.851         0.960    27.590         3.639        13.848 360.000 360.000
+Monocyte   20731.894         0.160     0.527         0.029    1.041         0.919             0.649            0.622         0.952    20.554         3.269        20.124 360.000 360.000
+Neutrophil 16128.128         0.124     0.371         0.001    1.050         0.814             0.751            0.396         0.984    16.886         2.898        19.281 360.000 360.000
+
+  rata-rata per nilai nucleus_shape:
+                      n_lobus  nuc_solidity  nuc_circularity  nuc_eccentricity
+nucleus_shape                                                                 
+irregular               1.080         0.900            0.569             0.645
+segmented-bilobed       1.140         0.814            0.377             0.788
+segmented-multilobed    1.237         0.781            0.295             0.737
+unsegmented-band        1.037         0.831            0.440             0.758
+unsegmented-indented    1.037         0.927            0.653             0.631
+unsegmented-round       1.032         0.978            0.854             0.491

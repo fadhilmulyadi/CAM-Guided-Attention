@@ -1,0 +1,324 @@
+j# LAPORAN FASE 2F — M11 (sensitivitas terpisah_di_nol) dan M9 (sel ganda)
+
+Dijalankan 2026-09-21 15:37 | parameter: τ_br 1.25, ρ_br 0.2, τ_lobus 4.0, ρ_lobus 0.4, aturan lubang `tidak`, saddle `min` | FPR target 0.01 | seed 2026
+
+## 0. Uji sanitas
+
+| uji | lolos | detail |
+|---|---|---|
+| halter leher 9 baris | YA | r_pisah 5.0000 (harap 5), r_lobus 20.0250 (harap 20,025), lobus 2 |
+| rantai leher 7 & 17 (min vs max) | YA | min 4.0000 (harap 4), max 9.0000 (harap 9), lobus 3 |
+| cakram konveks | YA | status tak_pernah_pecah |
+| dua cakram terpisah | YA | status terpisah_di_nol |
+| sel ganda terdeteksi dan dikoreksi | YA | f 0.533, status terpisah_di_nol → tak_pernah_pecah, luas inti 2514 → 1257 |
+| tonjolan kecil bukan sel kedua | YA | f 0.000 (harap < 0,2) |
+| bilobed dalam sel tunggal tak tersentuh | YA | f 0.000, r_pisah 3.0000 (harap 3), br 0.2137 → 0.2137 |
+| komposit menempel: terdeteksi, partisi memulihkan sel 1 | YA | f 0.550, terpisah_di_nol → tak_pernah_pecah (ref tak_pernah_pecah), IoU 1.0000 |
+| komposit berjauhan tidak menyambung | YA | nyambung False, status tak_pernah_pecah |
+| analisis kasus terpisah sempurna | YA | AUC 1.0, akurasi 1.0, posisi C 0.500 |
+
+**Seluruh 10 uji LOLOS.**
+
+Data: `hasil_fase2d\bridge_ratio_2d.csv` — 10298 baris, neutrofil 3329
+
+## 1. M11 — Sensitivitas terhadap `terpisah_di_nol`
+
+#### S0 baseline Fase 2D
+
+A = 1555, B = 976 | AUC **0.96674** | Youden 0.376355 (J 0.86025) | bootstrap median 0.371496, IK95 [0.307591; 0.391077] | 1/3 di IK95: **YA**
+akurasi @1/3 **0.932833** | @Youden 0.931252 | galat A 60, galat B 110 | sens band 0.9614, spes band 0.8873
+train→test: ambang train 0.358766, AUC test 0.95542, akurasi test @ambang 0.932380, @1/3 0.932380
+
+| kelompok | n | q25 | median | q75 | p_band | entropi | zona_023_043 | tak_pecah | terpisah0 | posisi_AB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A_sepakat_band | 1555 | 0.4763 | 0.5663 | 0.6632 | 0.9614 | 0.2358 | 0.1241 | 0.0315 | 6 | 0.0000 |
+| B_sepakat_segmented | 976 | 0.0841 | 0.1313 | 0.2206 | 0.1127 | 0.5080 | 0.1855 | 0.0010 | 65 | 1.0000 |
+| C_konflik_SNE_band | 662 | 0.3530 | 0.4251 | 0.5392 | 0.7915 | 0.7385 | 0.4743 | 0.0242 | 3 | 0.3247 |
+| D_konflik_BNE_segmented | 48 | 0.2778 | 0.4418 | 0.5274 | 0.6875 | 0.8960 | 0.2292 | 0.0000 | 1 | 0.2863 |
+| E_lainnya | 38 | 0.6499 | 1.0000 | 1.0000 | 0.9737 | 0.1756 | 0.0263 | 0.6316 | 0 | -0.9970 |
+| F_tak_bersubtipe | 50 | 0.1059 | 0.2216 | 0.3749 | 0.3200 | 0.9044 | 0.3600 | 0.0000 | 2 | 0.7924 |
+
+| cakupan | n_simpan | n_tunda | n_AB | akurasi | spes_band | sens_band | peng_A | peng_C |
+|---|---|---|---|---|---|---|---|---|
+| 1.0000 | 3329.0000 | 0.0000 | 2531.0000 | 0.9328 | 0.8873 | 0.9614 | – | – |
+| 0.9500 | 3163.0000 | 166.0000 | 2452.0000 | 0.9498 | 0.9075 | 0.9762 | 0.5675 | 2.3326 |
+| 0.9000 | 2996.0000 | 333.0000 | 2374.0000 | 0.9579 | 0.9221 | 0.9797 | 0.5143 | 2.3709 |
+| 0.8000 | 2663.0000 | 666.0000 | 2189.0000 | 0.9657 | 0.9388 | 0.9818 | 0.5882 | 2.2199 |
+| 0.7000 | 2330.0000 | 999.0000 | 1965.0000 | 0.9669 | 0.9403 | 0.9829 | 0.7008 | 1.9632 |
+| 0.5000 | 1664.0000 | 1665.0000 | 1422.0000 | 0.9782 | 0.9641 | 0.9859 | 0.8152 | 1.4739 |
+
+Uji reproduksi analisis terhadap angka Fase 2D:
+| ukuran | diperoleh | harapan_2D | cocok |
+|---|---|---|---|
+| auc | 0.966736 | 0.966740 | YA |
+| youden | 0.376355 | 0.376355 | YA |
+| acc_13 | 0.932833 | 0.932833 | YA |
+| acc_test_13 | 0.932380 | 0.932380 | YA |
+| posisi_C | 0.324713 | 0.324700 | YA |
+| def90_acc | 0.957877 | 0.957900 | YA |
+| def90_peng_C | 2.370889 | 2.370900 | YA |
+
+#### S1 buang terpisah_di_nol
+
+A = 1549, B = 911 | AUC **0.96824** | Youden 0.383903 (J 0.85860) | bootstrap median 0.375000, IK95 [0.310752; 0.393012] | 1/3 di IK95: **YA**
+akurasi @1/3 **0.933333** | @Youden 0.930894 | galat A 54, galat B 110 | sens band 0.9651, spes band 0.8793
+train→test: ambang train 0.358766, AUC test 0.95995, akurasi test @ambang 0.934959, @1/3 0.934959
+
+| kelompok | n | q25 | median | q75 | p_band | entropi | zona_023_043 | tak_pecah | terpisah0 | posisi_AB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A_sepakat_band | 1549 | 0.4769 | 0.5665 | 0.6636 | 0.9651 | 0.2182 | 0.1246 | 0.0316 | 0 | 0.0000 |
+| B_sepakat_segmented | 911 | 0.0945 | 0.1414 | 0.2323 | 0.1207 | 0.5315 | 0.1987 | 0.0011 | 0 | 1.0000 |
+| C_konflik_SNE_band | 659 | 0.3536 | 0.4254 | 0.5399 | 0.7951 | 0.7315 | 0.4765 | 0.0243 | 0 | 0.3319 |
+| D_konflik_BNE_segmented | 47 | 0.2944 | 0.4445 | 0.5397 | 0.7021 | 0.8787 | 0.2340 | 0.0000 | 0 | 0.2871 |
+| E_lainnya | 38 | 0.6499 | 1.0000 | 1.0000 | 0.9737 | 0.1756 | 0.0263 | 0.6316 | 0 | -1.0197 |
+| F_tak_bersubtipe | 48 | 0.1204 | 0.2260 | 0.3783 | 0.3333 | 0.9183 | 0.3750 | 0.0000 | 0 | 0.8011 |
+
+| cakupan | n_simpan | n_tunda | n_AB | akurasi | spes_band | sens_band | peng_A | peng_C |
+|---|---|---|---|---|---|---|---|---|
+| 1.0000 | 3252.0000 | 0.0000 | 2460.0000 | 0.9333 | 0.8793 | 0.9651 | – | – |
+| 0.9500 | 3089.0000 | 163.0000 | 2383.0000 | 0.9505 | 0.8997 | 0.9801 | 0.5538 | 2.3311 |
+| 0.9000 | 2927.0000 | 325.0000 | 2306.0000 | 0.9592 | 0.9161 | 0.9837 | 0.4974 | 2.3231 |
+| 0.8000 | 2602.0000 | 650.0000 | 2128.0000 | 0.9676 | 0.9339 | 0.9861 | 0.5749 | 2.1941 |
+| 0.7000 | 2276.0000 | 976.0000 | 1908.0000 | 0.9680 | 0.9351 | 0.9862 | 0.6862 | 1.9264 |
+| 0.5000 | 1626.0000 | 1626.0000 | 1385.0000 | 0.9791 | 0.9535 | 0.9914 | 0.7954 | 1.4719 |
+
+#### S2 pesimis (B terpisah_di_nol dianggap salah)
+
+A = 1555, B = 976 | AUC **0.90132** | Youden 0.376355 (J 0.79365) | bootstrap median 0.372423, IK95 [0.307591; 0.391077] | 1/3 di IK95: **YA**
+akurasi @1/3 **0.907151** | @Youden 0.905571 | galat A 60, galat B 175 | sens band 0.9614, spes band 0.8207
+train→test: ambang train 0.358766, AUC test 0.87022, akurasi test @ambang 0.897269, @1/3 0.897269
+
+| kelompok | n | q25 | median | q75 | p_band | entropi | zona_023_043 | tak_pecah | terpisah0 | posisi_AB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A_sepakat_band | 1555 | 0.4763 | 0.5663 | 0.6632 | 0.9614 | 0.2358 | 0.1241 | 0.0315 | 6 | 0.0000 |
+| B_sepakat_segmented | 976 | 0.0974 | 0.1503 | 0.2612 | 0.1793 | 0.6786 | 0.1855 | 0.0010 | 65 | 1.0000 |
+| C_konflik_SNE_band | 662 | 0.3530 | 0.4251 | 0.5392 | 0.7915 | 0.7385 | 0.4743 | 0.0242 | 3 | 0.3396 |
+| D_konflik_BNE_segmented | 48 | 0.2778 | 0.4418 | 0.5274 | 0.6875 | 0.8960 | 0.2292 | 0.0000 | 1 | 0.2994 |
+| E_lainnya | 38 | 0.6499 | 1.0000 | 1.0000 | 0.9737 | 0.1756 | 0.0263 | 0.6316 | 0 | -1.0425 |
+| F_tak_bersubtipe | 50 | 0.1059 | 0.2216 | 0.3749 | 0.3200 | 0.9044 | 0.3600 | 0.0000 | 2 | 0.8286 |
+
+| cakupan | n_simpan | n_tunda | n_AB | akurasi | spes_band | sens_band | peng_A | peng_C |
+|---|---|---|---|---|---|---|---|---|
+| 1.0000 | 3329.0000 | 0.0000 | 2531.0000 | 0.9072 | 0.8207 | 0.9614 | – | – |
+| 0.9500 | 3163.0000 | 166.0000 | 2452.0000 | 0.9233 | 0.8385 | 0.9762 | 0.5675 | 2.3326 |
+| 0.9000 | 2996.0000 | 333.0000 | 2374.0000 | 0.9305 | 0.8498 | 0.9797 | 0.5143 | 2.3709 |
+| 0.8000 | 2663.0000 | 666.0000 | 2189.0000 | 0.9360 | 0.8592 | 0.9818 | 0.5882 | 2.2199 |
+| 0.7000 | 2330.0000 | 999.0000 | 1965.0000 | 0.9338 | 0.8521 | 0.9829 | 0.7008 | 1.9632 |
+| 0.5000 | 1664.0000 | 1665.0000 | 1422.0000 | 0.9325 | 0.8343 | 0.9859 | 0.8152 | 1.4739 |
+
+## 2. M9 — Detektor sel ganda
+
+- mask terindeks 10298, cocok dengan CSV 10298/10298; citra RGB terindeks 10298, cocok 10298
+- pass 1 (fitur badan + inti asli): 10298 tugas, 177.3 detik (17.2 ms/tugas)
+
+### 2.1 Uji reproduksi implementasi terhadap bridge_ratio_2d.csv
+
+| ukuran | cocok | n | frak |
+|---|---|---|---|
+| bridge_ratio (|Δ|<1e-6) | 10297 | 10298 | 0.99990 |
+| status_topologi | 10298 | 10298 | 1.00000 |
+| n_lobus_kal | 10298 | 10298 | 1.00000 |
+| luas_nukleus | 10298 | 10298 | 1.00000 |
+
+Reproduksi 99.99% → implementasi ulang setara dengan pipeline Fase 2D.
+
+### 2.2 Kalibrasi ambang f_badan (independen dari A/B neutrofil)
+
+- negatif nyata (limfosit+monosit, 1 komponen inti): **2612**
+- positif nyata (limfosit+monosit, ≥2 komponen inti, komponen kedua ≥25%): **20**
+- komposit sintetis: 999 tugas, 30.7 detik (30.8 ms/tugas)
+- komposit menyambung dengan sel pusat: 967/999 (sisanya sudah dipisahkan M4, tidak relevan)
+- status inti komposit sebelum koreksi: terpisah_di_nol 814, normal 153
+| t | fpr_neg | tpr_sintetis | tpr_pos_nyata | neutrofil_terdeteksi | dari_terpisah0 | terpilih |
+|---|---|---|---|---|---|---|
+| 0.0824 | 0.0100 | 0.8790 | 0.9500 | 25 | 19 | YA |
+| 0.1000 | 0.0054 | 0.8480 | 0.9500 | 24 | 19 | TIDAK |
+| 0.1500 | 0.0031 | 0.7104 | 0.9000 | 22 | 18 | TIDAK |
+| 0.2000 | 0.0004 | 0.6070 | 0.9000 | 19 | 18 | TIDAK |
+| 0.2500 | 0.0004 | 0.4716 | 0.9000 | 18 | 18 | TIDAK |
+| 0.3000 | 0.0004 | 0.3733 | 0.8000 | 18 | 18 | TIDAK |
+| 0.3500 | 0.0000 | 0.2782 | 0.8000 | 18 | 18 | TIDAK |
+| 0.4000 | 0.0000 | 0.2120 | 0.8000 | 18 | 18 | TIDAK |
+| 0.4500 | 0.0000 | 0.1531 | 0.7500 | 17 | 17 | TIDAK |
+| 0.5000 | 0.0000 | 0.1075 | 0.7500 | 17 | 17 | TIDAK |
+| 0.5500 | 0.0000 | 0.0755 | 0.7000 | 16 | 16 | TIDAK |
+| 0.6000 | 0.0000 | 0.0496 | 0.6500 | 16 | 16 | TIDAK |
+
+**Ambang terpilih (Neyman–Pearson, FPR ≤ 1.0% pada negatif nyata): t = 0.0824, FPR yang benar-benar tercapai 0.995%** (26 dari 2612 negatif). Ambang diambil sebagai nilai terkecil yang memenuhi batas itu, bukan kuantil: kuantil tidak menjamin FPR ≤ α ketika f menumpuk di satu nilai. Negatif dengan f > 0: 9.7%. Pembanding Youden pada sintetis-vs-negatif: 0.0324 (TIDAK dipakai; bergantung pada sebaran jarak tempel yang saya pilih sendiri).
+
+Sensitivitas pada komposit menurut jarak tempel (fr kecil = tumpang tindih berat):
+| bin_fr | n | tpr | f_median |
+|---|---|---|---|
+| (0.7, 0.8] | 340 | 0.7471 | 0.1421 |
+| (0.8, 0.9] | 356 | 0.9270 | 0.2463 |
+| (0.9, 0.98] | 271 | 0.9815 | 0.4257 |
+
+- validasi partisi komposit: 400 tugas, 20.0 detik (50.0 ms/tugas)
+- Komposit terdeteksi 358/400. Setelah partisi: status inti sama dengan sel tunggal aslinya **98.04%**, bridge ratio dalam ±0,01 **96.37%**, IoU inti median **0.9992** (q10 0.9251).
+
+### 2.3 Penerapan pada seluruh sel
+
+| label | n | terdeteksi | frak |
+|---|---|---|---|
+| Basophil | 1218 | 3 | 0.0025 |
+| Eosinophil | 3117 | 15 | 0.0048 |
+| Lymphocyte | 1214 | 19 | 0.0157 |
+| Monocyte | 1420 | 27 | 0.0190 |
+| Neutrophil | 3329 | 25 | 0.0075 |
+
+- pass 2 (koreksi sel terdeteksi): 89 tugas, 6.6 detik (74.6 ms/tugas)
+| kelompok | n | terpisah0 | terdeteksi | terdeteksi_dan_terpisah0 | terdeteksi_bukan_terpisah0 |
+|---|---|---|---|---|---|
+| A_sepakat_band | 1555 | 6 | 8 | 6 | 2 |
+| B_sepakat_segmented | 976 | 65 | 10 | 9 | 1 |
+| C_konflik_SNE_band | 662 | 3 | 6 | 3 | 3 |
+| D_konflik_BNE_segmented | 48 | 1 | 1 | 1 | 0 |
+| E_lainnya | 38 | 0 | 0 | 0 | 0 |
+| F_tak_bersubtipe | 50 | 2 | 0 | 0 | 0 |
+
+**Dari 77 neutrofil `terpisah_di_nol`, 19 (24.7%) terdeteksi sebagai sel ganda.**
+Angka ini **batas bawah**, bukan hitungan sebenarnya. Sel negatif yang dipakai untuk mengkalibrasi ambang bisa saja sendiri memuat sel ganda yang intinya tertutup atau terbuang filter 2%; kontaminasi semacam itu menaikkan ambang, sehingga detektor melewatkan sel, bukan mengarang sel. Montase F2 (`terpisah_di_nol` yang TIDAK terdeteksi) adalah tempat memeriksa sel yang terlewat.
+Median luas inti neutrofil 5683 px; median luas inti sel terdeteksi 11687 px; setelah koreksi 5630 px.
+
+Transisi status sel neutrofil terdeteksi (lama → setelah koreksi):
+| status_topologi | kor_status | n |
+|---|---|---|
+| normal | normal | 1 |
+| normal | tak_pernah_pecah | 3 |
+| normal | terpisah_di_nol | 1 |
+| tak_pernah_pecah | tak_pernah_pecah | 1 |
+| terpisah_di_nol | normal | 18 |
+| terpisah_di_nol | terpisah_di_nol | 1 |
+
+Validasi terhadap 11 sel ganda dari adjudikasi montase Fase 2E (tidak dipakai untuk kalibrasi):
+| sel | sumber | f_badan | terdeteksi | luas_inti | br_lama | br_kor | status_kor |
+|---|---|---|---|---|---|---|---|
+| BNE_333793 | A yakin-salah (2E) | 0.6278 | YA | 12413 | 0.0000 | 0.6868 | normal |
+| BNE_839717 | A yakin-salah (2E) | 0.4204 | YA | 11270 | 0.0000 | 0.3742 | normal |
+| BNE_356501 | A yakin-salah (2E) | 0.7753 | YA | 10869 | 0.0000 | 0.7568 | normal |
+| BNE_51939 | A yakin-salah (2E) | 0.7144 | YA | 10720 | 0.0000 | 0.8092 | normal |
+| BNE_359949 | A yakin-salah (2E) | 0.7724 | YA | 14779 | 0.0000 | 0.7670 | normal |
+| BNE_290973 | A yakin-salah (2E) | 0.9138 | YA | 13678 | 0.0000 | 0.6228 | normal |
+| SNE_691743 | B yakin-benar (2E) | 0.8806 | YA | 13270 | 0.0000 | 0.4681 | normal |
+| SNE_699973 | B yakin-benar (2E) | 0.5438 | YA | 12778 | 0.0000 | 0.2428 | normal |
+| SNE_119786 | B yakin-benar (2E) | 0.8821 | YA | 15075 | 0.0000 | 0.2917 | normal |
+| SNE_316202 | B yakin-benar (2E) | 0.7625 | YA | 11206 | 0.0000 | 0.7555 | normal |
+| SNE_905668 | B yakin-benar (2E) | 0.0000 | TIDAK | 7517 | 0.0000 | – | – |
+
+### 2.4 Skenario setelah koreksi sel ganda
+
+#### S3a koreksi sel ganda (CSV + koreksi)
+
+A = 1555, B = 976 | AUC **0.96909** | Youden 0.383903 (J 0.86128) | bootstrap median 0.374201, IK95 [0.307591; 0.391148] | 1/3 di IK95: **YA**
+akurasi @1/3 **0.933623** | @Youden 0.931648 | galat A 54, galat B 114 | sens band 0.9653, spes band 0.8832
+train→test: ambang train 0.358766, AUC test 0.96052, akurasi test @ambang 0.936281, @1/3 0.936281
+
+| kelompok | n | q25 | median | q75 | p_band | entropi | zona_023_043 | tak_pecah | terpisah0 | posisi_AB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A_sepakat_band | 1555 | 0.4773 | 0.5667 | 0.6647 | 0.9653 | 0.2176 | 0.1248 | 0.0328 | 0 | 0.0000 |
+| B_sepakat_segmented | 976 | 0.0864 | 0.1344 | 0.2225 | 0.1168 | 0.5201 | 0.1895 | 0.0010 | 58 | 1.0000 |
+| C_konflik_SNE_band | 662 | 0.3536 | 0.4253 | 0.5403 | 0.7946 | 0.7327 | 0.4773 | 0.0257 | 0 | 0.3270 |
+| D_konflik_BNE_segmented | 48 | 0.3017 | 0.4458 | 0.5681 | 0.7083 | 0.8709 | 0.2292 | 0.0000 | 0 | 0.2795 |
+| E_lainnya | 38 | 0.6499 | 1.0000 | 1.0000 | 0.9737 | 0.1756 | 0.0263 | 0.6316 | 0 | -1.0025 |
+| F_tak_bersubtipe | 50 | 0.1059 | 0.2216 | 0.3749 | 0.3200 | 0.9044 | 0.3600 | 0.0000 | 2 | 0.7983 |
+
+| cakupan | n_simpan | n_tunda | n_AB | akurasi | spes_band | sens_band | peng_A | peng_C |
+|---|---|---|---|---|---|---|---|---|
+| 1.0000 | 3329.0000 | 0.0000 | 2531.0000 | 0.9336 | 0.8832 | 0.9653 | – | – |
+| 0.9500 | 3163.0000 | 166.0000 | 2452.0000 | 0.9507 | 0.9033 | 0.9801 | 0.5675 | 2.3326 |
+| 0.9000 | 2996.0000 | 333.0000 | 2373.0000 | 0.9595 | 0.9196 | 0.9838 | 0.5015 | 2.3558 |
+| 0.8000 | 2663.0000 | 666.0000 | 2187.0000 | 0.9675 | 0.9361 | 0.9862 | 0.5850 | 2.2048 |
+| 0.7000 | 2330.0000 | 999.0000 | 1964.0000 | 0.9684 | 0.9374 | 0.9870 | 0.6986 | 1.9581 |
+| 0.5000 | 1664.0000 | 1665.0000 | 1422.0000 | 0.9817 | 0.9618 | 0.9924 | 0.8113 | 1.4769 |
+
+#### S3b koreksi sel ganda (seluruhnya implementasi ulang)
+
+A = 1555, B = 976 | AUC **0.96865** | Youden 0.383903 (J 0.86128) | bootstrap median 0.374201, IK95 [0.307591; 0.391077] | 1/3 di IK95: **YA**
+akurasi @1/3 **0.934018** | @Youden 0.931648 | galat A 53, galat B 114 | sens band 0.9659, spes band 0.8832
+train→test: ambang train 0.358766, AUC test 0.96053, akurasi test @ambang 0.936281, @1/3 0.936281
+
+| kelompok | n | q25 | median | q75 | p_band | entropi | zona_023_043 | tak_pecah | terpisah0 | posisi_AB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A_sepakat_band | 1555 | 0.4773 | 0.5667 | 0.6647 | 0.9659 | 0.2145 | 0.1241 | 0.0328 | 0 | 0.0000 |
+| B_sepakat_segmented | 976 | 0.0864 | 0.1344 | 0.2225 | 0.1168 | 0.5201 | 0.1895 | 0.0010 | 58 | 1.0000 |
+| C_konflik_SNE_band | 662 | 0.3536 | 0.4253 | 0.5403 | 0.7961 | 0.7297 | 0.4773 | 0.0257 | 0 | 0.3270 |
+| D_konflik_BNE_segmented | 48 | 0.3017 | 0.4458 | 0.5681 | 0.7083 | 0.8709 | 0.2292 | 0.0000 | 0 | 0.2795 |
+| E_lainnya | 38 | 0.6499 | 1.0000 | 1.0000 | 0.9737 | 0.1756 | 0.0263 | 0.6316 | 0 | -1.0025 |
+| F_tak_bersubtipe | 50 | 0.1059 | 0.2216 | 0.3749 | 0.3200 | 0.9044 | 0.3600 | 0.0000 | 2 | 0.7983 |
+
+| cakupan | n_simpan | n_tunda | n_AB | akurasi | spes_band | sens_band | peng_A | peng_C |
+|---|---|---|---|---|---|---|---|---|
+| 1.0000 | 3329.0000 | 0.0000 | 2531.0000 | 0.9340 | 0.8832 | 0.9659 | – | – |
+| 0.9500 | 3163.0000 | 166.0000 | 2453.0000 | 0.9503 | 0.9033 | 0.9795 | 0.5546 | 2.3629 |
+| 0.9000 | 2996.0000 | 333.0000 | 2374.0000 | 0.9591 | 0.9196 | 0.9831 | 0.4950 | 2.3709 |
+| 0.8000 | 2663.0000 | 666.0000 | 2188.0000 | 0.9671 | 0.9361 | 0.9854 | 0.5818 | 2.2123 |
+| 0.7000 | 2330.0000 | 999.0000 | 1964.0000 | 0.9679 | 0.9373 | 0.9862 | 0.6965 | 1.9581 |
+| 0.5000 | 1664.0000 | 1665.0000 | 1423.0000 | 0.9810 | 0.9618 | 0.9914 | 0.8100 | 1.4769 |
+
+#### S4 buang sel terdeteksi ganda
+
+A = 1547, B = 966 | AUC **0.97002** | Youden 0.376355 (J 0.86302) | bootstrap median 0.372423, IK95 [0.307591; 0.391148] | 1/3 di IK95: **YA**
+akurasi @1/3 **0.934739** | @Youden 0.933148 | galat A 54, galat B 110 | sens band 0.9651, spes band 0.8861
+train→test: ambang train 0.358766, AUC test 0.96276, akurasi test @ambang 0.936759, @1/3 0.936759
+
+| kelompok | n | q25 | median | q75 | p_band | entropi | zona_023_043 | tak_pecah | terpisah0 | posisi_AB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A_sepakat_band | 1547 | 0.4768 | 0.5665 | 0.6634 | 0.9651 | 0.2184 | 0.1248 | 0.0317 | 0 | 0.0000 |
+| B_sepakat_segmented | 966 | 0.0860 | 0.1332 | 0.2210 | 0.1139 | 0.5115 | 0.1874 | 0.0010 | 56 | 1.0000 |
+| C_konflik_SNE_band | 656 | 0.3536 | 0.4251 | 0.5383 | 0.7942 | 0.7334 | 0.4787 | 0.0229 | 0 | 0.3265 |
+| D_konflik_BNE_segmented | 47 | 0.2944 | 0.4445 | 0.5397 | 0.7021 | 0.8787 | 0.2340 | 0.0000 | 0 | 0.2817 |
+| E_lainnya | 38 | 0.6499 | 1.0000 | 1.0000 | 0.9737 | 0.1756 | 0.0263 | 0.6316 | 0 | -1.0004 |
+| F_tak_bersubtipe | 50 | 0.1059 | 0.2216 | 0.3749 | 0.3200 | 0.9044 | 0.3600 | 0.0000 | 2 | 0.7960 |
+
+| cakupan | n_simpan | n_tunda | n_AB | akurasi | spes_band | sens_band | peng_A | peng_C |
+|---|---|---|---|---|---|---|---|---|
+| 1.0000 | 3304.0000 | 0.0000 | 2513.0000 | 0.9347 | 0.8861 | 0.9651 | – | – |
+| 0.9500 | 3139.0000 | 165.0000 | 2435.0000 | 0.9520 | 0.9066 | 0.9801 | 0.5566 | 2.3504 |
+| 0.9000 | 2974.0000 | 330.0000 | 2358.0000 | 0.9601 | 0.9213 | 0.9837 | 0.5048 | 2.3809 |
+| 0.8000 | 2643.0000 | 661.0000 | 2173.0000 | 0.9682 | 0.9381 | 0.9861 | 0.5881 | 2.2173 |
+| 0.7000 | 2313.0000 | 991.0000 | 1952.0000 | 0.9688 | 0.9396 | 0.9861 | 0.6983 | 1.9669 |
+| 0.5000 | 1652.0000 | 1652.0000 | 1415.0000 | 0.9809 | 0.9617 | 0.9913 | 0.8119 | 1.4848 |
+
+**Seberapa besar kesimpulan bergantung pada ambang t?** Tabel berikut mengulang S4 (buang sel terdeteksi, tanpa koreksi) pada seluruh ambang sapuan. Murah karena hanya membuang baris. Bila AUC dan posisi C nyaris rata di seluruh baris, pilihan ambang bukan titik rapuh.
+
+| t | n_dibuang | n_A | n_B | auc | acc_13 | spes_band | posisi_C | terpilih |
+|---|---|---|---|---|---|---|---|---|
+| 0.0824 | 25 | 1547 | 966 | 0.9700 | 0.9347 | 0.8861 | 0.3265 | YA |
+| 0.1000 | 24 | 1548 | 966 | 0.9700 | 0.9348 | 0.8861 | 0.3265 | TIDAK |
+| 0.1500 | 22 | 1548 | 967 | 0.9701 | 0.9348 | 0.8862 | 0.3255 | TIDAK |
+| 0.2000 | 19 | 1548 | 968 | 0.9701 | 0.9348 | 0.8864 | 0.3247 | TIDAK |
+| 0.2500 | 18 | 1549 | 968 | 0.9701 | 0.9348 | 0.8864 | 0.3247 | TIDAK |
+| 0.3000 | 18 | 1549 | 968 | 0.9701 | 0.9348 | 0.8864 | 0.3247 | TIDAK |
+| 0.3500 | 18 | 1549 | 968 | 0.9701 | 0.9348 | 0.8864 | 0.3247 | TIDAK |
+| 0.4000 | 18 | 1549 | 968 | 0.9701 | 0.9348 | 0.8864 | 0.3247 | TIDAK |
+| 0.4500 | 17 | 1550 | 968 | 0.9695 | 0.9345 | 0.8864 | 0.3245 | TIDAK |
+| 0.5000 | 17 | 1550 | 968 | 0.9695 | 0.9345 | 0.8864 | 0.3245 | TIDAK |
+| 0.5500 | 16 | 1550 | 969 | 0.9695 | 0.9345 | 0.8865 | 0.3243 | TIDAK |
+| 0.6000 | 16 | 1550 | 969 | 0.9695 | 0.9345 | 0.8865 | 0.3243 | TIDAK |
+
+### 2.5 Montase dan berkas sensus visual
+
+- `montase_F1_neutrofil_terdeteksi.png`: 25 dari 25 sel
+- `montase_F2_terpisah0_tidak_terdeteksi.png`: 36 dari 58 sel
+- `montase_F3_dekat_ambang.png`: 9 dari 9 sel
+- `montase_F4_limfomono_dua_inti.png`: 20 dari 20 sel
+- `F7_sensus_visual.csv`: 91 sel. Isi kolom `keputusan_manusia` dengan GANDA / TUNGGAL / RAGU berdasarkan citra RGB.
+
+## 3. Ringkasan lintas skenario
+
+| skenario | n_A | n_B | auc | youden | ik_lo | ik_hi | sepertiga_di_ik | acc_13 | galat_A | galat_B | spes_band | auc_test | acc_test_13 | posisi_C | zona_C_per_A | def90_acc | def90_peng_C |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| S0 baseline Fase 2D | 1555 | 976 | 0.9667 | 0.3764 | 0.3076 | 0.3911 | YA | 0.9328 | 60 | 110 | 0.8873 | 0.9554 | 0.9324 | 0.3247 | 3.8216 | 0.9579 | 2.3709 |
+| S1 buang terpisah_di_nol | 1549 | 911 | 0.9682 | 0.3839 | 0.3108 | 0.3930 | YA | 0.9333 | 54 | 110 | 0.8793 | 0.9599 | 0.9350 | 0.3319 | 3.8242 | 0.9592 | 2.3231 |
+| S2 pesimis (B terpisah_di_nol dianggap salah) | 1555 | 976 | 0.9013 | 0.3764 | 0.3076 | 0.3911 | YA | 0.9072 | 60 | 175 | 0.8207 | 0.8702 | 0.8973 | 0.3396 | 3.8216 | 0.9305 | 2.3709 |
+| S3a koreksi sel ganda (CSV + koreksi) | 1555 | 976 | 0.9691 | 0.3839 | 0.3076 | 0.3911 | YA | 0.9336 | 54 | 114 | 0.8832 | 0.9605 | 0.9363 | 0.3270 | 3.8261 | 0.9595 | 2.3558 |
+| S3b koreksi sel ganda (seluruhnya implementasi ulang) | 1555 | 976 | 0.9686 | 0.3839 | 0.3076 | 0.3911 | YA | 0.9340 | 53 | 114 | 0.8832 | 0.9605 | 0.9363 | 0.3270 | 3.8459 | 0.9591 | 2.3709 |
+| S4 buang sel terdeteksi ganda | 1547 | 966 | 0.9700 | 0.3764 | 0.3076 | 0.3911 | YA | 0.9347 | 54 | 110 | 0.8861 | 0.9628 | 0.9368 | 0.3265 | 3.8367 | 0.9601 | 2.3809 |
+
+- **S1 buang terpisah_di_nol**: ΔAUC +0.0015, Δakurasi@1/3 +0.0005, Δspesifisitas -0.0080, Δposisi C +0.0072
+- **S2 pesimis (B terpisah_di_nol dianggap salah)**: ΔAUC -0.0654, Δakurasi@1/3 -0.0257, Δspesifisitas -0.0666, Δposisi C +0.0148
+- **S3a koreksi sel ganda (CSV + koreksi)**: ΔAUC +0.0024, Δakurasi@1/3 +0.0008, Δspesifisitas -0.0041, Δposisi C +0.0023
+- **S3b koreksi sel ganda (seluruhnya implementasi ulang)**: ΔAUC +0.0019, Δakurasi@1/3 +0.0012, Δspesifisitas -0.0041, Δposisi C +0.0023
+- **S4 buang sel terdeteksi ganda**: ΔAUC +0.0033, Δakurasi@1/3 +0.0019, Δspesifisitas -0.0012, Δposisi C +0.0018
+
+Cara membaca: S1 dan S2 mengapit dampak maksimum `terpisah_di_nol` tanpa perlu tahu mana yang benar-benar sel ganda. Bila selisih S0–S2 kecil, M9 tidak mengancam klaim apa pun. S3/S4 adalah koreksi yang sebenarnya, dan baru boleh dilaporkan setelah sensus visual F7 diisi.

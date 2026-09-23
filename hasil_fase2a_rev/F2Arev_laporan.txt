@@ -1,0 +1,179 @@
+
+===========================================================================
+FASE 2A-REV - KOREKSI ATURAN SADDLE (min, bukan max)
+===========================================================================
+Waktu        : 2026-09-17 19:44:38
+Konektivitas : 8   Isi lubang: ya
+
+===========================================================================
+S0. UJI SANITAS PADA NUKLEUS SINTETIS
+===========================================================================
+Dijalankan sebelum data asli disentuh.
+
+  kasus sintetis                  | r_lobus | status           | br(min) | harapan | br(max) | n_lobus |   
+  --------------------------------+---------+------------------+---------+---------+---------+---------+---
+  cakram konveks                  |   30.02 | tak_pernah_pecah |  1.0000 |       - |  1.0000 |       1 | OK
+  halter leher 4 / lobus 20       |   20.02 | normal           |  0.2497 |  0.2000 |  0.2497 |       2 | OK
+  rantai leher 3 dan 8 / lobus 22 |   22.02 | normal           |  0.1816 |  0.1364 |  0.4087 |       3 | OK
+
+  Kasus 3 adalah uji pembeda. Jawaban benar 3/22 = 0,1364.
+  Aturan 'max' akan menjawab 8/22 = 0,3636 - itulah bug jalanan lalu.
+  >>> UJI SANITAS: LOLOS
+
+Mengindeks mask dan membaca CSV
+-------------------------------
+  Mask terindeks: 10,298
+  Baris CSV     : 10,298
+  Replikasi kelompok Fase 1: LOLOS
+  Sel diproses  : 10,298   (tanpa mask: 0)
+
+Menghitung
+----------
+  Pekerja: 7
+  Selesai 240.1 detik
+  Berhasil: 10,298
+
+===========================================================================
+K0. MEKANISME BUG - JUMLAH PENGGABUNGAN SIGNIFIKAN PER KELOMPOK
+===========================================================================
+Aturan 'max' hanya menyimpang bila sebuah sel punya LEBIH DARI SATU
+saddle. Kelompok dengan banyak saddle adalah yang paling rusak.
+
+  kelompok                |    n | mean saddle | median | >=2 saddle
+  ------------------------+------+-------------+--------+-----------
+  A_sepakat_band          | 1555 |        1.48 |      1 |      45.4%
+  B_sepakat_segmented     |  976 |        2.18 |      2 |      74.9%
+  C_konflik_SNE_band      |  662 |        1.88 |      2 |      65.7%
+  D_konflik_BNE_segmented |   48 |        1.62 |      1 |      47.9%
+  F_tak_bersubtipe        |   50 |        2.18 |      2 |      78.0%
+
+===========================================================================
+K1. ABLASI ATURAN SADDLE  [KOREKSI TERDOKUMENTASI]
+===========================================================================
+  tau  | AUC min | ambang min | akur1/3 min | AUC max | ambang max | akur1/3 max
+  -----+---------+------------+-------------+---------+------------+------------
+  0.1  |  0.8873 |     0.3588 |       88.4% |  0.5727 |     0.9654 |       63.3%
+  0.25 |  0.8845 |     0.3588 |       88.7% |  0.5877 |     0.5662 |       64.7%
+  0.5  |  0.8803 |     0.3588 |       88.7% |  0.6274 |     0.4410 |       67.7%
+  0.75 |  0.8807 |     0.3588 |       88.8% |  0.6506 |     0.4152 |       69.1%
+  1    |  0.8800 |     0.3588 |       88.9% |  0.6665 |     0.4152 |       70.4%
+  1.25 |  0.8801 |     0.3588 |       88.9% |  0.6850 |     0.4152 |       71.4%
+  1.5  |  0.8793 |     0.3588 |       88.9% |  0.6995 |     0.4152 |       71.9%
+  2    |  0.8780 |     0.3588 |       88.9% |  0.7262 |     0.4152 |       73.3%
+  2.5  |  0.8780 |     0.3588 |       88.9% |  0.7405 |     0.4152 |       74.4%
+  3    |  0.8797 |     0.3588 |       88.9% |  0.7555 |     0.4050 |       75.3%
+  4    |  0.8792 |     0.3588 |       89.0% |  0.7866 |     0.4050 |       77.4%
+  5    |  0.8794 |     0.3588 |       89.0% |  0.8204 |     0.4050 |       79.7%
+  Kolom 'max' mereproduksi jalanan yang salah sebagai pembanding.
+
+===========================================================================
+K2. PEMILIHAN PARAMETER DI SPLIT TRAIN SAJA
+===========================================================================
+AUC dihitung hanya pada A dan B di split train. Test tidak disentuh.
+
+  tau \ rho |     0 |   0.1 |   0.2 |   0.3 |   0.4
+  ----------+-------+-------+-------+-------+------
+  0.1       | 0.886 | 0.886 | 0.890 | 0.895 | 0.895
+  0.25      | 0.883 | 0.885 | 0.887 | 0.892 | 0.893
+  0.5       | 0.880 | 0.882 | 0.884 | 0.889 | 0.890
+  0.75      | 0.881 | 0.881 | 0.884 | 0.888 | 0.890
+  1         | 0.883 | 0.883 | 0.884 | 0.888 | 0.889
+  1.25      | 0.883 | 0.883 | 0.883 | 0.888 | 0.889
+  1.5       | 0.882 | 0.882 | 0.882 | 0.887 | 0.888
+  2         | 0.881 | 0.881 | 0.881 | 0.886 | 0.887
+  2.5       | 0.882 | 0.882 | 0.882 | 0.886 | 0.887
+  3         | 0.884 | 0.884 | 0.884 | 0.888 | 0.888
+  4         | 0.883 | 0.883 | 0.883 | 0.887 | 0.888
+  5         | 0.883 | 0.883 | 0.883 | 0.886 | 0.887
+
+  >>> Terbaik di TRAIN: tau = 0.1, rho = 0.3  (AUC train 0.8952)
+
+===========================================================================
+K3. HASIL PADA PARAMETER TERPILIH (tau=0.1, rho=0.3)
+===========================================================================
+  AUC (A vs B, seluruh split) : 0.8933     [Fase 1 v1: 0.9227]
+  Ambang optimal Youden       : 0.3588   (J = 0.7632)
+  Bootstrap 2000x median     : 0.3594   [v1: 0.3333]
+  IK 95% bootstrap            : [0.3220 - 0.3927]   [v1: 0.3192-0.3671]
+  Ambang klinis 1/3           : 0.3333
+  >>> 1/3 di dalam IK 95%     : YA
+  Akurasi pada 1/3            : 89.13%   [v1: 90.04%]
+
+Generalisasi train -> test
+--------------------------
+  Ambang dari TRAIN     : 0.3715   (n=940+569)
+  AUC di TEST           : 0.8777   (n=459+310)
+  Akurasi TEST @ambang  : 89.08%
+  Akurasi TEST @ 1/3    : 89.21%
+
+===========================================================================
+K4. SEBARAN DAN AMBIGUITAS PER KELOMPOK
+===========================================================================
+  kelompok                |    n |    q25 | median |    q75 | p(band) | entropi
+  ------------------------+------+--------+--------+--------+---------+--------
+  A_sepakat_band          | 1555 | 0.4765 | 0.5700 | 0.6667 |   0.946 |   0.303
+  B_sepakat_segmented     |  976 | 0.0832 | 0.1414 | 0.2736 |   0.196 |   0.713
+  C_konflik_SNE_band      |  662 | 0.3581 | 0.4332 | 0.5555 |   0.801 |   0.721
+  D_konflik_BNE_segmented |   48 | 0.3725 | 0.4881 | 0.6122 |   0.833 |   0.650
+  E_lainnya               |   38 | 0.5893 | 0.6898 | 0.8736 |   0.974 |   0.176
+  F_tak_bersubtipe        |   50 | 0.1142 | 0.2546 | 0.4166 |   0.400 |   0.971
+  1,000 bit = ambiguitas maksimum
+
+  Posisi C_konflik          pada sumbu A->B :   31.9%    [v1 untuk C: 54,2% LDA]
+  Posisi D_konflik          pada sumbu A->B :   19.1%    [v1 untuk C: 54,2% LDA]
+  Posisi F_tak_bersubtipe   pada sumbu A->B :   73.6%    [v1 untuk C: 54,2% LDA]
+
+Kepadatan di zona perbatasan
+----------------------------
+  pita          |     A |     B |     C
+  --------------+-------+-------+------
+  [0.28 - 0.38] |  3.8% |  8.0% | 20.4%
+  [0.23 - 0.43] | 10.9% | 17.6% | 43.4%
+
+===========================================================================
+K5. KONTROL LINTAS KELAS DAN LOBUS vs T2
+===========================================================================
+  kelas      |    n | median br | tak pernah pecah | rata n_lobus
+  -----------+------+-----------+------------------+-------------
+  Basophil   | 1218 |    0.4621 |             6.8% |         6.37
+  Eosinophil | 3117 |    0.1208 |             0.9% |         6.32
+  Lymphocyte | 1214 |    1.0000 |            60.6% |         1.91
+  Monocyte   | 1420 |    0.8004 |            13.1% |         6.12
+  Neutrophil | 3329 |    0.4685 |             1.3% |         8.71
+
+Jumlah lobus per nucleus_shape (pembanding T2: 81,4% gagal)
+-----------------------------------------------------------
+  nucleus_shape        |    n | mean n_lobus | hanya 1 lobus | median br
+  ---------------------+------+--------------+---------------+----------
+  unsegmented-round    | 1069 |        1.961 |         61.9% |    1.0000
+  unsegmented-indented | 1342 |        5.984 |         14.1% |    0.8207
+  irregular            |  870 |        5.170 |         17.1% |    0.7303
+  unsegmented-band     | 2614 |        8.868 |          1.6% |    0.5313
+  segmented-bilobed    | 3119 |        6.516 |          1.0% |    0.1290
+  segmented-multilobed | 1284 |        7.290 |          0.5% |    0.1052
+
+===========================================================================
+K6. PERBANDINGAN DENGAN FASE 1 DAN TRIANGULASI
+===========================================================================
+  n terbandingkan        : 3,279
+  Pearson  (v1, v2-rev)  : 0.7771    [jalanan max: 0.4938]
+  Spearman (v1, v2-rev)  : 0.7954    [jalanan max: 0.4658]
+  Selisih v2-rev minus v1: mean 0.0629  median 0.0000
+  Berpindah sisi 1/3     : 391 (11.92%)   [jalanan max: 29.40%]
+  Spearman(br, indeks LDA): -0.6818   [v1: -0.7403, jalanan max: -0.2964]
+
+  Tersimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2a_rev\bridge_ratio_v2rev.csv
+  Tersimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2a_rev\kejadian_merge_v2rev.csv  (68,769 kejadian)
+
+===========================================================================
+RINGKASAN
+===========================================================================
+  Parameter terpilih di train : tau=0.1, rho=0.3
+  AUC (A vs B)                : 0.8933     [v1 0.9227 | bug-max 0.6665]
+  Ambang bootstrap            : 0.3594   [v1 0.3333]
+  IK 95%                      : [0.3220 - 0.3927]
+  1/3 di dalam IK             : YA
+  Akurasi @1/3                : 89.13%   [v1 90.04%]
+
+Kirim seluruh keluaran ini.
+===========================================================================

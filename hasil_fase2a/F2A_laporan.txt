@@ -1,0 +1,229 @@
+
+===========================================================================
+FASE 2A - BRIDGE RATIO EKSAK VIA PERSISTENSI TOPOLOGIS
+===========================================================================
+Waktu          : 2026-09-17 18:55:50
+Folder mask    : D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\pbcseg_final_v1
+CSV WBCAtt+    : D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\pbc_attr_v1_ccrop_all.csv
+tau baku       : 1.0 piksel
+Konektivitas   : 8
+Isi lubang     : ya
+
+Mengindeks berkas mask
+----------------------
+  Mask terindeks: 20,596
+
+Membaca CSV atribut
+-------------------
+  Baris: 10,298
+
+Kelompok (replikasi definisi Fase 1)
+------------------------------------
+  kelompok                |     n | Fase 1 | status
+  ------------------------+-------+--------+-------
+  A_sepakat_band          | 1,555 |  1,555 | COCOK 
+  B_sepakat_segmented     |   976 |    976 | COCOK 
+  C_konflik_SNE_band      |   662 |    662 | COCOK 
+  D_konflik_BNE_segmented |    48 |     48 | COCOK 
+  E_lainnya               |    38 |     38 | COCOK 
+  F_tak_bersubtipe        |    50 |     50 | COCOK 
+  Z_non_neutrofil         | 6,969 |      - | -     
+  >>> Replikasi kelompok: LOLOS
+
+  Sel akan diproses : 10,298
+  Tanpa mask        : 0
+
+Menghitung
+----------
+  Pekerja: 7
+  Selesai dalam 201.1 detik (19.5 ms per sel)
+  Berhasil: 10,298
+  Data Fase 1 dimuat: 3,279 baris
+  Tersimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2a\bridge_ratio_v2.csv  (10,298 baris)
+  Tersimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2a\kejadian_merge.csv  (31,947 kejadian)
+
+===========================================================================
+D1. DIAGNOSTIK PENGUKURAN
+===========================================================================
+  fitur           |    n |      mean |       std |       min |       q25 |       med |       q75 |        max
+  ----------------+------+-----------+-----------+-----------+-----------+-----------+-----------+-----------
+  r_lobus         | 3329 |   23.9534 |    4.5848 |   15.2315 |   20.6155 |   23.0000 |   26.1725 |    51.8652
+  r_pisah_v2      | 3129 |   12.9252 |    5.3624 |    0.0000 |   10.2956 |   13.3417 |   16.1555 |    35.3553
+  bridge_ratio_v2 | 3329 |    0.5880 |    0.2383 |    0.0000 |    0.4650 |    0.6165 |    0.7439 |     1.0000
+  luas_nukleus    | 3329 | 5958.8084 | 1236.7010 | 3593.0000 | 5269.0000 | 5743.0000 | 6368.0000 | 18363.0000
+
+Kasus tepi yang metode erosi lama tidak tangani
+-----------------------------------------------
+    normal                2,972  (89.28%)
+    tak_pernah_pecah        200  ( 6.01%)
+    terpisah_di_nol         157  ( 4.72%)
+
+    nukleus dengan lubang terisi : 578
+    mask sudah >1 komponen       : 170
+
+===========================================================================
+D2. PERBANDINGAN v1 (erosi) vs v2 (persistensi)
+===========================================================================
+  Sel terbandingkan : 3,279
+  Pearson  r        : 0.4938
+  Spearman rho      : 0.4658
+  Selisih (v2 - v1) : mean 0.2132  median 0.1374  sd 0.2382
+  Berpindah sisi ambang 1/3 : 964 (29.40%)
+
+  Bias diskretisasi v1 diperkirakan positif. Selisih median
+  negatif berarti dugaan itu benar dan v1 memang over-estimate.
+
+===========================================================================
+D3. SEBARAN bridge_ratio_v2 PER KELOMPOK
+===========================================================================
+  kelompok                |    n |   mean |    q25 | median |    q75
+  ------------------------+------+--------+--------+--------+-------
+  A_sepakat_band          | 1555 | 0.6419 | 0.5325 | 0.6513 | 0.7623
+  B_sepakat_segmented     |  976 | 0.4837 | 0.2768 | 0.5279 | 0.6778
+  C_konflik_SNE_band      |  662 | 0.6025 | 0.4651 | 0.6078 | 0.7386
+  D_konflik_BNE_segmented |   48 | 0.5788 | 0.4407 | 0.6400 | 0.7262
+  E_lainnya               |   38 | 0.8368 | 0.6291 | 1.0000 | 1.0000
+  F_tak_bersubtipe        |   50 | 0.5788 | 0.4209 | 0.6056 | 0.7177
+
+===========================================================================
+D4. VALIDASI AMBANG SEPERTIGA [TEMUAN UTAMA]
+===========================================================================
+  AUC bridge_ratio_v2 (A vs B) : 0.6665
+    pembanding Fase 1 (v1)     : 0.9227
+  Ambang optimal Youden        : 0.4152   (J = 0.2928)
+  Bootstrap 2000x median      : 0.4167
+  IK 95% bootstrap             : [0.3839 - 0.4974]
+  Ambang klinis konvensional   : 0.3333  (sepertiga)
+  >>> 1/3 berada di dalam IK 95% : TIDAK
+  Akurasi memakai 1/3 tanpa fitting : 70.37%   (Fase 1: 90.04%)
+
+Generalisasi lintas split (bukan hanya stabilitas sampling)
+-----------------------------------------------------------
+  Ambang dari TRAIN saja   : 0.4159  (n=940+569)
+  Akurasi di TEST          : 70.74%   (n=459+310)
+  Akurasi di TEST pakai 1/3: 69.70%
+
+===========================================================================
+D5. POSISI KELOMPOK KONFLIK DAN KUANTIFIKASI AMBIGUITAS
+===========================================================================
+  Posisi C_konflik          pada sumbu A->B :   35.3%
+  Posisi D_konflik          pada sumbu A->B :    9.2%
+  Posisi F_tak_bersubtipe   pada sumbu A->B :   37.0%
+  (0% = identik dengan A band, 100% = identik dengan B segmented)
+
+Entropi keputusan geometris pada ambang 1/3
+-------------------------------------------
+  kelompok                |    n | -> band | p(band) | entropi (bit)
+  ------------------------+------+---------+---------+--------------
+  A_sepakat_band          | 1555 |   1,489 |   0.958 |         0.253
+  B_sepakat_segmented     |  976 |     684 |   0.701 |         0.880
+  C_konflik_SNE_band      |  662 |     609 |   0.920 |         0.402
+  D_konflik_BNE_segmented |   48 |      40 |   0.833 |         0.650
+  E_lainnya               |   38 |      38 |   1.000 |         0.000
+  F_tak_bersubtipe        |   50 |      44 |   0.880 |         0.529
+  1,000 bit = setara lempar koin = ambiguitas maksimum
+
+Kepadatan di zona perbatasan
+----------------------------
+  pita bridge_ratio |    A |     B |     C
+  ------------------+------+-------+------
+  [0.28 - 0.38]     | 2.1% |  9.0% |  7.3%
+  [0.23 - 0.43]     | 6.2% | 15.8% | 15.7%
+
+===========================================================================
+D6. SENSITIVITAS TERHADAP tau [UJI KEKOKOHAN]
+===========================================================================
+Bila ambang optimal stabil di seluruh rentang tau yang wajar,
+klaim validasi 1/3 tidak bergantung pada pilihan parameter.
+
+  tau  |    AUC | ambang Youden | akurasi 1/3 | tak pecah | pecah di 0 |        posisi C
+  -----+--------+---------------+-------------+-----------+------------+----------------
+  0    | 0.5728 |        0.9644 |      62.66% |        16 |        157 |           61.4%
+  0.25 | 0.5877 |        0.5662 |      64.72% |        82 |        157 |           25.0%
+  0.5  | 0.6274 |        0.4410 |      67.72% |       145 |        157 |           21.6%
+  0.75 | 0.6506 |        0.4152 |      69.14% |       173 |        157 |           34.2%
+  1    | 0.6665 |        0.4152 |      70.37% |       200 |        157 | 35.3%  <== baku
+  1.5  | 0.6995 |        0.4152 |      71.95% |       251 |        157 |           34.9%
+  2    | 0.7262 |        0.4152 |      73.33% |       298 |        157 |           34.6%
+  3    | 0.7555 |        0.4050 |      75.27% |       428 |        157 |           38.4%
+  4    | 0.7866 |        0.4050 |      77.36% |       565 |        157 |           36.4%
+  5    | 0.8204 |        0.4050 |      79.65% |       752 |        157 |           39.6%
+  Tersimpan: D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2a\sensitivitas_tau.csv
+
+===========================================================================
+D7. UJI PREDIKSI - 50 SEL BERPREFIX 'NEUTROPHIL_'
+===========================================================================
+Prediksi dibuat SEBELUM data dilihat: sel-sel ini adalah kasus
+yang anotator PBC menolak menentukan subtipenya. Bila zona ambigu
+di sekitar 1/3 itu nyata, mereka seharusnya menumpuk di sana.
+Sumber label ketiga, sepenuhnya independen.
+
+  n = 50,  median = 0.6056,  IQR = [0.4209 - 0.7177]
+  Di pita [0,23 - 0,43] : 18.0%   (pembanding A dan B di tabel D5)
+  p(band) = 0.880,  entropi = 0.529 bit
+
+  Catatan: n=50, jadi ini indikasi, bukan bukti kuat sendirian.
+
+===========================================================================
+D8. KONTROL LINTAS KELAS SEL
+===========================================================================
+Limfosit berinti bulat dan konveks. Secara matematis nukleusnya
+TIDAK BOLEH pecah. Bila v2 benar, mereka harus menumpuk di 1,0.
+Fase 1 melaporkan NOL sel yang tidak pernah pecah - itu gejala
+bahwa metode erosi lama menangkap pecahan akibat derau tepi.
+
+  kelas      |    n | median br | tak pernah pecah | rata n_lobus
+  -----------+------+-----------+------------------+-------------
+  Basophil   | 1218 |    0.6551 |      284 (23.3%) |         2.36
+  Eosinophil | 3117 |    0.2615 |       147 (4.7%) |         2.59
+  Lymphocyte | 1214 |    1.0000 |    1,169 (96.3%) |         1.07
+  Monocyte   | 1420 |    1.0000 |      754 (53.1%) |         1.65
+  Neutrophil | 3329 |    0.6165 |       200 (6.0%) |         2.82
+
+===========================================================================
+D9. PENGHITUNGAN LOBUS BERBASIS PERSISTENSI vs T2
+===========================================================================
+Dokumen T2: penghitungan lobus via komponen terhubung GAGAL.
+81,4% sel 'segmented-multilobed' hanya menghasilkan 1 komponen.
+Persistensi menghitung lobus yang tersambung filamen kromatin tipis
+sebagai puncak terpisah, jadi seharusnya jauh lebih baik.
+
+  nucleus_shape        |    n | mean n_lobus | median | hanya 1 lobus | median br
+  ---------------------+------+--------------+--------+---------------+----------
+  unsegmented-round    | 1069 |        1.071 |    1.0 |         96.0% |    1.0000
+  unsegmented-indented | 1342 |        1.627 |    1.0 |         54.8% |    1.0000
+  irregular            |  870 |        1.805 |    2.0 |         49.1% |    0.9404
+  unsegmented-band     | 2614 |        2.609 |    3.0 |          7.0% |    0.6336
+  segmented-bilobed    | 3119 |        2.551 |    2.0 |          4.4% |    0.3021
+  segmented-multilobed | 1284 |        3.347 |    3.0 |          3.4% |    0.3936
+
+  segmented-multilobed dengan hanya 1 lobus : 3.4%    (T2 metode lama: 81,4%)
+
+===========================================================================
+D10. TRIANGULASI DENGAN INDEKS LDA FASE 1
+===========================================================================
+  Spearman(bridge_ratio_v2, indeks_LDA) = -0.2964   (n=3,279)
+  Pembanding Fase 1 (v1)                = -0.7403
+
+  Dua ukuran geometris independen. Korelasi negatif kuat
+  berarti keduanya mengukur sumbu segmentasi yang sama.
+
+  Grafik tersimpan di D:\Muhammad_Fadhil_Mulyadi\Kuliah\Semester_5\Rekayasa Sistem Informasi Cerdas\hasil_fase2a
+
+===========================================================================
+RINGKASAN UNTUK KEPUTUSAN LANJUT
+===========================================================================
+  AUC v2 (A vs B)          : 0.6665        [v1: 0.9227]
+  Ambang bootstrap median  : 0.4167   [v1: 0.3333]
+  IK 95%                   : [0.3839 - 0.4974]  [v1: 0.3192-0.3671]
+  Akurasi pada 1/3         : 70.37%      [v1: 90.04%]
+  1/3 di dalam IK 95%      : TIDAK
+
+  Yang perlu diperiksa dari keluaran di atas:
+    1. Apakah ambang Youden stabil lintas tau (tabel D6)?
+    2. Apakah limfosit menumpuk di 'tak pernah pecah' (tabel D8)?
+    3. Apakah penghitungan lobus mengalahkan 81,4% di T2 (D9)?
+    4. Apakah 50 sel tanpa subtipe jatuh di zona ambigu (D7)?
+
+Kirim seluruh keluaran ini untuk penentuan Fase 2B.
+===========================================================================

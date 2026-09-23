@@ -1,0 +1,32 @@
+Attribute Name,Attribute Value,F1
+Nucleus Shape,Segmented-Multilobed,64.6
+Nucleus Shape,Irregular,65.29
+Chromatin Density,Loosely,74.09
+Nucleus Shape,Segmented-Bilobed,76.89
+Cytoplasm Color,Purple Blue,79.5
+Cytoplasm Vacuole,Yes,81.3
+Cell Size,Small,81.7875
+Nucleus Shape,Unsegmented-Indented,83.045
+Cytoplasm Color,Blue,84.1675
+Cell Size,Big,85.19500000000001
+Nucleus Shape,Unsegmented-Band,85.3725
+Cell Shape,Irregular,85.4725
+Nucleus Shape,Unsegmented-Round,85.745
+Cytoplasm Texture,Frosted,90.855
+NC Ratio,High,93.655
+Cell Shape,Round,95.8775
+Granule Color,Purple,97.1325
+Chromatin Density,Densely,97.255
+Cytoplasm Texture,Clear,97.515
+Cytoplasm Vacuole,No,98.4875
+Granule Color,Pink,98.9275
+NC Ratio,Low,99.13499999999999
+Granule Type,Coarse,99.1975
+Cytoplasm Color,Light Blue,99.2775
+Granule Type,Nil,99.50999999999999
+Granule Type,Small,99.51
+Granularity,No,99.5375
+Granule Color,Nil,99.575
+Granularity,Yes,99.83500000000001
+Granule Type,Round,99.88250000000001
+Granule Color,Red,99.95

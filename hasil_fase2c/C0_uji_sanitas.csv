@@ -1,0 +1,11 @@
+kasus,lolos,catatan,status,n_lobus,rp_min,rp_max,komponen_mentah,komponen_akhir,r_lobus
+cakram_konveks,True,,tak_pernah_pecah,1,,,1,1,30.01666203960727
+halter_leher9,True,,normal,2,5.0,5.0,1,1,20.024984394500787
+rantai_leher7_17,True,,normal,3,4.0,9.0,1,1,20.024984394500787
+dua_cakram_terpisah,True,,terpisah_di_nol,2,0.0,0.0,2,2,20.024984394500787
+cakram_plus_tonjolan,True,,tak_pernah_pecah,1,,,1,1,30.01666203960727
+tetangga_di_luar_sel,True,,tak_pernah_pecah,1,,,2,1,28.0178514522438
+serpihan_di_bawah_2persen,True,,tak_pernah_pecah,1,,,2,1,28.0178514522438
+serpihan_di_atas_2persen,True,,terpisah_di_nol,2,0.0,0.0,2,2,28.0178514522438
+dua_lobus_besar_terpisah,True,,terpisah_di_nol,2,0.0,0.0,2,2,22.02271554554524
+pad_vs_tanpa_pad,True,rasio 4.342,-,-1,31.0,134.6142637315972,-1,-1,134.6142637315972

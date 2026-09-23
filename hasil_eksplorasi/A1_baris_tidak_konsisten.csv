@@ -1,0 +1,3 @@
+,img_name,label,cell_size,cell_shape,nucleus_shape,nuclear_cytoplasmic_ratio,chromatin_density,cytoplasm_vacuole,cytoplasm_texture,cytoplasm_colour,granule_type,granule_colour,granularity,path,split
+1954,EO_197001_ccrop.jpg,Eosinophil,small,round,segmented-bilobed,low,densely,no,clear,light blue,nil,red,yes,EO_197001_ccrop.jpg,train
+8156,EO_244392_ccrop.jpg,Eosinophil,big,round,segmented-bilobed,low,densely,no,clear,light blue,nil,red,yes,EO_244392_ccrop.jpg,test

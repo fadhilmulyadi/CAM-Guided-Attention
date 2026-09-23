@@ -1,0 +1,7 @@
+atribut,fitur_piksel,AUC,ambang,akurasi_ambang_tunggal
+nuclear_cytoplasmic_ratio,rasio_NC,0.992,0.6044,0.95
+cell_size,luas_sel,0.902,14380.0,0.827
+cytoplasm_vacuole,frak_vakuola,0.969,0.0033,0.992
+granularity,cyto_std,0.641,34.9671,0.691
+chromatin_density,nuc_gray_std,0.768,32.5726,0.909
+cell_shape,sel_solidity,0.897,0.9809,0.82

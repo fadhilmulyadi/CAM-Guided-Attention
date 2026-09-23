@@ -1,0 +1,99 @@
+=== cell_size (% per kelas) ===
+cell_size    big  small
+label                  
+Basophil    27.3   72.7
+Eosinophil  63.3   36.7
+Lymphocyte   0.8   99.2
+Monocyte    86.5   13.5
+Neutrophil  60.6   39.4
+
+=== cell_shape (% per kelas) ===
+cell_shape  irregular  round
+label                       
+Basophil         11.0   89.0
+Eosinophil        8.3   91.7
+Lymphocyte       32.9   67.1
+Monocyte         55.5   44.5
+Neutrophil       22.6   77.4
+
+=== nucleus_shape (% per kelas) ===
+nucleus_shape  irregular  segmented-bilobed  segmented-multilobed  unsegmented-band  unsegmented-indented  unsegmented-round
+label                                                                                                                       
+Basophil            41.5               28.6                  19.1               6.4                   2.1                2.3
+Eosinophil           0.8               68.7                  19.6               9.9                   0.7                0.3
+Lymphocyte           3.7                0.0                   0.0               0.0                  18.9               77.4
+Monocyte            19.0                0.3                   0.0               0.0                  74.7                6.0
+Neutrophil           0.8               18.8                  13.2              66.9                   0.2                0.2
+
+=== nuclear_cytoplasmic_ratio (% per kelas) ===
+nuclear_cytoplasmic_ratio  high    low
+label                                 
+Basophil                    0.5   99.5
+Eosinophil                  0.0  100.0
+Lymphocyte                 92.8    7.2
+Monocyte                    7.3   92.7
+Neutrophil                  0.0  100.0
+
+=== chromatin_density (% per kelas) ===
+chromatin_density  densely  loosely
+label                              
+Basophil             100.0      0.0
+Eosinophil            99.4      0.6
+Lymphocyte            97.7      2.3
+Monocyte              40.2     59.8
+Neutrophil            99.0      1.0
+
+=== cytoplasm_vacuole (% per kelas) ===
+cytoplasm_vacuole     no   yes
+label                         
+Basophil            99.8   0.2
+Eosinophil          99.7   0.3
+Lymphocyte         100.0   0.0
+Monocyte            53.9  46.1
+Neutrophil          96.3   3.7
+
+=== cytoplasm_texture (% per kelas) ===
+cytoplasm_texture  clear  frosted
+label                            
+Basophil           100.0      0.0
+Eosinophil         100.0      0.0
+Lymphocyte          35.2     64.8
+Monocyte            11.5     88.5
+Neutrophil         100.0      0.0
+
+=== cytoplasm_colour (% per kelas) ===
+cytoplasm_colour  blue  light blue  purple blue
+label                                          
+Basophil           0.0        99.7          0.3
+Eosinophil         0.1        99.9          0.0
+Lymphocyte        61.3         3.0         35.7
+Monocyte          46.1         7.6         46.3
+Neutrophil         0.0       100.0          0.0
+
+=== granule_type (% per kelas) ===
+granule_type  coarse   nil  round  small
+label                                   
+Basophil        99.4   0.0    0.0    0.6
+Eosinophil       0.0   0.1   99.9    0.0
+Lymphocyte       0.1  99.7    0.0    0.2
+Monocyte         0.0  99.8    0.0    0.2
+Neutrophil       0.1   0.1    0.0   99.8
+
+=== granule_colour (% per kelas) ===
+granule_colour   nil  pink  purple    red
+label                                    
+Basophil         0.0   0.0   100.0    0.0
+Eosinophil       0.0   0.0     0.0  100.0
+Lymphocyte      99.7   0.0     0.3    0.0
+Monocyte        99.8   0.2     0.0    0.0
+Neutrophil       0.1  97.4     2.5    0.0
+
+=== granularity (% per kelas) ===
+granularity    no    yes
+label                   
+Basophil      0.0  100.0
+Eosinophil    0.0  100.0
+Lymphocyte   99.7    0.3
+Monocyte     99.8    0.2
+Neutrophil    0.1   99.9
+
