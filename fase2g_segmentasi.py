@@ -174,7 +174,7 @@ def ukur_offset_ccrop(dir_pbc, dir_ccrop, n=25):
     sama = [k for k in ccrops if k in mentah]
     log(f"  ccrop terindeks {len(ccrops)}, PBC mentah terindeks {len(mentah)}, beririsan {len(sama)}")
     if not sama:
-        return None, None, None
+        return None, {}
     suara, rinci, per_offset = {}, [], {}
     for k in sorted(sama)[:n]:
         a = np.array(Image.open(ccrops[k]).convert("RGB"))
@@ -372,6 +372,82 @@ def tugas_verifikasi(args):
     return lolos
 
 
+def tugas_verifikasi_crop(args):
+    """UJI KEDUA, INDEPENDEN, untuk offset crop.
+
+    `--tugas cek` mencocokkan PIKSEL citra mentah terhadap citra ccrop. Pada apusan darah
+    yang mulus, menggeser satu baris hanya mengubah sedikit, sehingga marginnya bisa tipis.
+    Uji ini memakai kriteria yang sama sekali lain: segmentasi citra PBC MENTAH pada
+    beberapa nilai dy, lalu bandingkan mask hasilnya dengan mask ANOTASI WBCAtt+.
+    Offset yang benar memaksimalkan IoU nukleus. Bila kedua uji menunjuk dy yang sama,
+    soal ini tertutup; bila tidak, JANGAN lanjut.
+
+    Ini juga menguji seluruh jalur `ig` ujung-ke-ujung pada sel yang punya kebenaran dasar,
+    karena jalur mentah -> crop -> inferensi persis sama."""
+    import pandas as pd
+    import torch
+    log("## Uji silang offset crop — kriteria IoU nukleus terhadap mask anotasi\n")
+    df = pd.read_csv(args.csv)
+    mask_idx, mentah_idx = {}, {}
+    for f in glob.glob(os.path.join(args.dir_ccrop, "**", "*.png"), recursive=True):
+        if "_mask" in os.path.basename(f):
+            mask_idx[kunci_nama(f)] = f
+    for f in glob.glob(os.path.join(args.dir_pbc, "**", "*.jpg"), recursive=True):
+        mentah_idx[kunci_nama(f)] = f
+    kunci = [k for k in (kunci_nama(x) for x in df.img_name) if k in mask_idx and k in mentah_idx]
+    if not kunci:
+        raise SystemExit("Tidak ada sel yang punya citra mentah DAN mask anotasi. "
+                         "Periksa --dir-pbc dan --dir-ccrop.")
+    rng = np.random.default_rng(42)
+    kunci = list(rng.choice(kunci, size=min(args.n_crop, len(kunci)), replace=False))
+    log(f"  {len(kunci)} sel dipakai (punya citra mentah 360x363 dan mask anotasi 360x360)")
+    seg, transform = muat_model(args)
+    baris = []
+    for dy in range(args.dy_maks + 1):
+        conf = np.zeros((6, 6), np.int64)
+        for i in range(0, len(kunci), args.batch):
+            potongan = kunci[i:i + args.batch]
+            tensors, gts = [], []
+            for k in potongan:
+                im = Image.open(mentah_idx[k]).convert("RGB")
+                if im.size[1] - 360 < dy:
+                    continue
+                tensors.append(transform(potong_ccrop(im, dy, args.dx)))
+                g = np.array(Image.open(mask_idx[k]))
+                gts.append(g[..., 0] if g.ndim == 3 else g)
+            if not tensors:
+                continue
+            with torch.inference_mode(), torch.autocast("cuda", dtype=torch.bfloat16):
+                pred = seg(torch.stack(tensors).cuda()).argmax(dim=1).cpu().numpy()
+            for p, g in zip(pred, gts):
+                m = (g >= 0) & (g < 6)
+                conf += np.bincount(6 * g[m].ravel().astype(np.int64) + p[m].ravel().astype(np.int64),
+                                    minlength=36).reshape(6, 6)
+        tp = np.diag(conf).astype(float)
+        iou = tp / (conf.sum(1) + conf.sum(0) - tp)
+        baris.append(dict(dy=dy, iou_nukleus=100 * iou[2], iou_sitoplasma=100 * iou[1],
+                          miou=float(np.nanmean(iou[1:]) * 100)))
+        log(f"  dy={dy}: IoU nukleus {100 * iou[2]:6.2f} | sitoplasma {100 * iou[1]:6.2f} | "
+            f"mIoU {np.nanmean(iou[1:]) * 100:6.2f}")
+    t = pd.DataFrame(baris)
+    t.to_csv(os.path.join(args.keluar, "H3_verifikasi_crop.csv"), index=False)
+    menang = int(t.loc[t.iou_nukleus.idxmax(), "dy"])
+    kedua = float(t.nlargest(2, "iou_nukleus").iou_nukleus.iloc[1])
+    log(f"\n  **dy terbaik menurut IoU nukleus: {menang}** "
+        f"({t.iou_nukleus.max():.2f} versus pesaing terdekat {kedua:.2f}, "
+        f"selisih {t.iou_nukleus.max() - kedua:+.2f} poin)")
+    h0 = os.path.join(args.keluar, "H0_offset_ccrop.json")
+    if os.path.exists(h0):
+        dy0 = json.load(open(h0))["dy"]
+        cocok = dy0 == menang
+        log(f"  Uji pencocokan piksel (`--tugas cek`) memilih dy={dy0}. "
+            f"**{'SEPAKAT — soal offset tertutup.' if cocok else 'TIDAK SEPAKAT — JANGAN LANJUT.'}**")
+        if not cocok:
+            log("  Dua kriteria independen memberi jawaban berbeda. Selesaikan dulu sebelum "
+                "satu pun angka monotonisitas dibaca.")
+    return menang
+
+
 def tugas_pbc(args):
     """Kontrol in-domain: segmentasi ulang seluruh sel WBCAtt+ yang SUDAH punya mask anotasi.
     Dari sini kita ukur berapa banyak bridge ratio bergeser ketika mask diprediksi."""
@@ -379,9 +455,21 @@ def tugas_pbc(args):
     log("## Kontrol in-domain — segmentasi ulang sel WBCAtt+\n")
     df = pd.read_csv(args.csv)
     img_idx = {}
-    for f in glob.glob(os.path.join(args.dir_ccrop, "**", "*.jpg"), recursive=True):
-        if "_mask" not in os.path.basename(f):
-            img_idx[kunci_nama(f)] = f
+    if args.dari_mentah:
+        if args.dy is None:
+            raise SystemExit("--dari-mentah butuh --dy (jalankan `cek` dan `verifikasi-crop` dulu).")
+        for f in glob.glob(os.path.join(args.dir_pbc, "**", "*.jpg"), recursive=True):
+            img_idx.setdefault(kunci_nama(f), f)
+        log(f"  sumber: citra PBC MENTAH, di-crop dy={args.dy} dx={args.dx} "
+            "— jalur yang SAMA PERSIS dengan `ig`, supaya kontrolnya sebanding")
+        dy, dx = args.dy, args.dx
+    else:
+        for f in glob.glob(os.path.join(args.dir_ccrop, "**", "*.jpg"), recursive=True):
+            if "_mask" not in os.path.basename(f):
+                img_idx[kunci_nama(f)] = f
+        log("  sumber: citra ccrop WBCAtt+ (bukan jalur `ig`). Pakai --dari-mentah untuk "
+            "kontrol yang sebanding dengan `ig`.")
+        dy, dx = 0, 0
     tugas = [(kunci_nama(r.img_name), img_idx[kunci_nama(r.img_name)])
              for r in df.itertuples() if kunci_nama(r.img_name) in img_idx]
     if args.hanya_neutrofil:
@@ -390,7 +478,7 @@ def tugas_pbc(args):
     log(f"  {len(tugas)} sel")
     seg, transform = muat_model(args)
     inferensi(seg, transform, tugas, os.path.join(args.keluar, "mask_pred_pbc"),
-              args.batch, 0, 0, simpan_citra=False)
+              args.batch, dy, dx, simpan_citra=False)
 
 
 def tugas_ig(args):
@@ -419,7 +507,7 @@ def tugas_ig(args):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--tugas", choices=["cek", "verifikasi", "pbc", "ig"], required=True)
+    ap.add_argument("--tugas", choices=["cek", "verifikasi", "verifikasi-crop", "pbc", "ig"], required=True)
     ap.add_argument("--dir-model", default="./m2f_tiny_1024_color_20260414_091312")
     ap.add_argument("--ckpt", default=None)
     ap.add_argument("--dir-pbc", default=None, help="folder PBC asli (berisi subfolder ig/, neutrophil/, ...)")
@@ -431,7 +519,11 @@ def main():
     ap.add_argument("--dx", type=int, default=0)
     ap.add_argument("--n-cek", type=int, default=25)
     ap.add_argument("--n-verif", type=int, default=400, help="0 = seluruh test split")
+    ap.add_argument("--n-crop", type=int, default=200, help="sel untuk uji silang offset crop")
+    ap.add_argument("--dy-maks", type=int, default=3, help="dy yang disapu: 0..dy_maks")
     ap.add_argument("--hanya-neutrofil", action="store_true")
+    ap.add_argument("--dari-mentah", action="store_true",
+                    help="tugas pbc: pakai citra PBC mentah + crop, bukan ccrop WBCAtt+")
     args = ap.parse_args()
     os.makedirs(args.keluar, exist_ok=True)
     log(f"# FASE 2G — segmentasi | tugas `{args.tugas}` | {time.strftime('%Y-%m-%d %H:%M')}\n")
@@ -439,6 +531,8 @@ def main():
         tugas_cek(args)
     elif args.tugas == "verifikasi":
         tugas_verifikasi(args)
+    elif args.tugas == "verifikasi-crop":
+        tugas_verifikasi_crop(args)
     elif args.tugas == "pbc":
         tugas_pbc(args)
     else:

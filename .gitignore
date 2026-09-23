@@ -11,3 +11,4 @@ m2f_tiny_1024_color_*/
 *.ckpt
 # cache
 __pycache__/
+fadhil_env/
